@@ -1,0 +1,11 @@
+Package: indexing
+Type: Package
+Title: Database Tools For R Objects
+Version: 0.0-1
+Date: 2010-02-06
+Depends: mmap
+Author: Jeffrey A. Ryan
+Maintainer: Jeffrey A. Ryan <jeff.a.ryan@gmail.com>
+Description: Database Tools for R Objects
+License: GPL2
+LazyLoad: yes

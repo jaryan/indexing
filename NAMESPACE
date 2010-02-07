@@ -1,0 +1,10 @@
+useDynLib(indexing)
+
+export(
+  makeIndex,
+  searchIndex
+)
+
+S3method(makeIndex, integer)
+S3method(makeIndex, double)
+S3method(makeIndex, character)
