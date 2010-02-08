@@ -1,6 +1,8 @@
 useDynLib(indexing)
 
 export(
+  .IndexEnv,
+
   makeIndex,
   searchIndex
 )
