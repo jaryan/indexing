@@ -1,9 +1,10 @@
 searchIndex <-
-function(column, x, SIZE=1e5) {
+function(column, x, SIZE=1e5, env=.IndexEnv) {
   # only applicable to equality currently
   if(missing(column))
     stop("column must be specified")
-  .x <- get(".IndexEnv", .GlobalEnv)[[column]]
+  #.x <- get(".IndexEnv", .GlobalEnv)[[column]]
+  .x <- env[[column]]
   binsearch <- xts:::binsearch
   if(!is.null(.x$l) && is.character(.x$l)) {
     x <- which(x==.x$l) 

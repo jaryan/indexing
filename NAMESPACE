@@ -4,7 +4,8 @@ export(
   .IndexEnv,
 
   makeIndex,
-  searchIndex
+  searchIndex,
+  searchIndexGT
 )
 
 S3method(makeIndex, integer)
