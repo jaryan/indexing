@@ -4,10 +4,19 @@ export(
   .IndexEnv,
 
   makeIndex,
-  searchIndex,
-  searchIndexGT
+  searchIndex
 )
 
 S3method(makeIndex, integer)
 S3method(makeIndex, double)
 S3method(makeIndex, character)
+
+S3method("<",  "indexed")
+S3method("<=", "indexed")
+S3method(">",  "indexed")
+S3method(">=", "indexed")
+
+S3method("[", "indexed_db")
+
+S3method("&", "rowid")
+S3method("|", "rowid")

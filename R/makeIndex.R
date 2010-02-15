@@ -9,6 +9,7 @@ function(x, column=NULL, envir=.IndexEnv, ...) {
     column <- deparse(substitute(x))
   if(!is.numeric(x))
     x <- as.factor(x)
+  envir[[column]] <- structure(list(),class="indexed")
   envir[[column]]$o <- order(x)
   tmp.s <- as.integer(x[envir[[column]]$o])
    writeBin(tmp.s, paste(column,"_sorted.bin",sep=""))

@@ -7,7 +7,7 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE) {
 
   if(length(x) == 2) { # range query
     if(missing(type))
-      type <- c(">=","=<")
+      type <- c(">=","<=")
     if(length(type) != 2L) stop("length of 'type' and 'x' must match")
     i <- seq(searchIndex(column, x[1], type=type[1], SIZE, env, range=TRUE),
              searchIndex(column, x[2], type=type[2], SIZE, env, range=TRUE))
@@ -63,11 +63,12 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE) {
         return(final_index[x_start])
       i <- seq(final_index[x_start], length(.x$s))
     } else {
-      stop(paste('type:',type,'not one of [==, !=, =, <, <=, >, >=]'))
+      stop(paste('type:',sQuote(type),
+           'not one of [==, !=, =, <, <=, >, >=]'))
     }
   }
 
   if(length(i)==2 && i[2] > length(.x$s))
     return(logical(0))
-  .x$o[i]
+  structure(.x$o[i], class="rowid")
 }
