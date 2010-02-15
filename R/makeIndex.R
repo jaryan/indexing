@@ -22,16 +22,16 @@ function(x, column=NULL, envir=.IndexEnv, ...) {
   } else envir[[column]]$rle <- NULL
   if(is.factor(x)) {
     x <- levels(x)
-  #} else x <- unique(x) # this should be NULL
+    writeBin(x, paste(column,"_levels.bin",sep=""))
+    envir[[column]]$l <- x
   } else x <- NULL
-  writeBin(x, paste(column,"_levels.bin",sep=""))
-  envir[[column]]$l <- x
 }
 
 makeIndex.double <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
+  envir[[column]] <- structure(list(),class="indexed")
   envir[[column]]$o <- order(x)
   tmp.s <- as.double(x[envir[[column]]$o])
    writeBin(tmp.s, paste(column,"_sorted.bin",sep=""))
@@ -46,6 +46,7 @@ function(x, column=NULL, envir=.IndexEnv, ...) {
     column <- deparse(substitute(x))
   if(!is.numeric(x))
     x <- as.factor(x)
+  envir[[column]] <- structure(list(),class="indexed")
   envir[[column]]$o <- order(x)
   tmp.s <- as.integer(x[envir[[column]]$o])
    writeBin(tmp.s, paste(column,"_sorted.bin",sep=""))
@@ -58,9 +59,8 @@ function(x, column=NULL, envir=.IndexEnv, ...) {
   } else envir[[column]]$rle <- NULL
   if(is.factor(x)) {
     x <- levels(x)
-  #} else x <- unique(x) # this should be NULL
+    writeBin(x, paste(column,"_levels.bin",sep=""))
+    envir[[column]]$l <- x
   } else x <- NULL
-  writeBin(x, paste(column,"_levels.bin",sep=""))
-  envir[[column]]$l <- x
 }
 

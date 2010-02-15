@@ -40,14 +40,35 @@
   else searchIndex(deparse(substitute(e2)), e1, "<=")
 }
 `==.indexed` <- function(e1,e2) {
-  if(inherits(e1, 'indexed'))
-    searchIndex(deparse(substitute(e1)), e2, "=")
-  else searchIndex(deparse(substitute(e2)), e1, "=")
+  e <- integer()
+  if(inherits(e1, 'indexed')) {
+    for(i in 1:length(e2)) {
+      e <- c(e,searchIndex(deparse(substitute(e1)), e2[i], "="))
+      e <- unique(e)
+    }
+  } else {
+    for(i in 1:length(e2)) {
+      e <- c(e,searchIndex(deparse(substitute(e1)), e2[i], "="))
+      e <- unique(e)
+    }
+  }
+  structure(e, class='rowid')
 }
+
 `!=.indexed` <- function(e1,e2) {
-  if(inherits(e1, 'indexed'))
-    searchIndex(deparse(substitute(e1)), e2, "!=")
-  else searchIndex(deparse(substitute(e2)), e1, "!=")
+  e <- integer()
+  if(inherits(e1, 'indexed')) {
+    for(i in 1:length(e2)) {
+      e <- c(e,searchIndex(deparse(substitute(e1)), e2[i], "!="))
+      e <- unique(e)
+    }
+  } else {
+    for(i in 1:length(e2)) {
+      e <- c(e,searchIndex(deparse(substitute(e1)), e2[i], "!="))
+      e <- unique(e)
+    }
+  }
+  structure(e, class='rowid')
 }
 
 `%r%` <- function(e1, e2) {

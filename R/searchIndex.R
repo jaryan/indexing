@@ -70,5 +70,8 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE) {
 
   if(length(i)==2 && i[2] > length(.x$s))
     return(logical(0))
+  if(length(i)==2 && i[2] < i[1])
+    return(logical(0))
+
   structure(.x$o[i], class="rowid")
 }

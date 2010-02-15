@@ -4,6 +4,7 @@ export(
   .IndexEnv,
 
   makeIndex,
+  loadIndex,
   searchIndex,
 
   "%r%"
