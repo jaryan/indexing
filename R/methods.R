@@ -14,7 +14,9 @@
 
 `[.indexed_db` <- function(x, i, j, ...) {
   i <- eval(match.call(`[.indexed_db`)$i, envir=x)
-  i
+  if(!missing(j))
+    get(j)[i]
+  else i
 }
 
 `<.indexed` <- function(e1,e2) {
@@ -37,3 +39,21 @@
     searchIndex(deparse(substitute(e1)), e2, ">=")
   else searchIndex(deparse(substitute(e2)), e1, "<=")
 }
+`==.indexed` <- function(e1,e2) {
+  if(inherits(e1, 'indexed'))
+    searchIndex(deparse(substitute(e1)), e2, "=")
+  else searchIndex(deparse(substitute(e2)), e1, "=")
+}
+`!=.indexed` <- function(e1,e2) {
+  if(inherits(e1, 'indexed'))
+    searchIndex(deparse(substitute(e1)), e2, "!=")
+  else searchIndex(deparse(substitute(e2)), e1, "!=")
+}
+
+`%r%` <- function(e1, e2) {
+  UseMethod("%r%") 
+}
+`%r%.indexed` <- function(e1, e2) {
+  searchIndex(deparse(substitute(e1)), e2)
+}
+

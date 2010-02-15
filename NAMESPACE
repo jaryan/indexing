@@ -4,7 +4,9 @@ export(
   .IndexEnv,
 
   makeIndex,
-  searchIndex
+  searchIndex,
+
+  "%r%"
 )
 
 S3method(makeIndex, integer)
@@ -15,6 +17,9 @@ S3method("<",  "indexed")
 S3method("<=", "indexed")
 S3method(">",  "indexed")
 S3method(">=", "indexed")
+S3method("==", "indexed")
+S3method("!=", "indexed")
+S3method("%r%", "indexed")
 
 S3method("[", "indexed_db")
 
