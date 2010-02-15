@@ -12,10 +12,18 @@
 # method to allow R-style subsetting using
 # unquoted boolean operations
 
-`[.indexed_db` <- function(x, i, j, ...) {
+`[.indexed_db` <- function(x, i, j, envir=.IndexEnv, ...) {
   i <- eval(match.call(`[.indexed_db`)$i, envir=x)
-  if(!missing(j))
-    get(j)[i]
+  if(!missing(j)) {
+    # j should be the column list in .IndexEnv, $d the data
+    #get(j, envir=envir)[["d"]][i]
+    vars <- all.vars(match.call(`[.indexed_db`)$j)
+    tmp.env <- new.env()
+    for(v in 1:length(vars)) {
+      assign(vars[v], get(vars[v], envir=envir)[['d']][i], tmp.env)
+    }
+    eval(match.call(`[.indexed_db`)$j, envir=tmp.env)
+  }
   else i
 }
 
