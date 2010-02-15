@@ -13,16 +13,22 @@
 # unquoted boolean operations
 
 `[.indexed_db` <- function(x, i, j, envir=.IndexEnv, ...) {
-  i <- eval(match.call(`[.indexed_db`)$i, envir=x)
+  mc_i <- match.call(`[.indexed_db`)$i
+  if(is.character(mc_i))  
+    mc_i <- parse(text=mc_i)
+  i <- eval(mc_i, envir=as.list(x,rev(sys.frames())), enclos=parent.frame())
   if(!missing(j)) {
+    mc_j <- match.call(`[.indexed_db`)$j
+    if(is.character(mc_j)) 
+      mc_j <- parse(text=mc_j)
     # j should be the column list in .IndexEnv, $d the data
     #get(j, envir=envir)[["d"]][i]
-    vars <- all.vars(match.call(`[.indexed_db`)$j)
+    vars <- all.vars(mc_j)
     tmp.env <- new.env()
     for(v in 1:length(vars)) {
       assign(vars[v], get(vars[v], envir=envir)[['d']][i], tmp.env)
     }
-    eval(match.call(`[.indexed_db`)$j, envir=tmp.env)
+    eval(mc_j, envir=tmp.env)
   }
   else i
 }
