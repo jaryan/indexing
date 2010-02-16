@@ -1,9 +1,9 @@
-makeIndex <-
+addIndex <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
-  UseMethod("makeIndex")
+  UseMethod("addIndex")
 }
 
-makeIndex.integer <-
+addIndex.integer <-
 function(x, column=NULL, mode=integer(), envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
@@ -18,7 +18,7 @@ function(x, column=NULL, mode=integer(), envir=.IndexEnv, ...) {
   envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""))
 }
 
-makeIndex.double <-
+addIndex.double <-
 function(x, column=NULL, mode=double(), envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
@@ -33,7 +33,7 @@ function(x, column=NULL, mode=double(), envir=.IndexEnv, ...) {
   envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""),mode=integer())
 }
 
-makeIndex.character <-
+addIndex.character <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))

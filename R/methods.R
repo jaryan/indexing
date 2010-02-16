@@ -16,6 +16,7 @@
   if(!missing(group))
     return(match.call(`[.indexed_db`))
   mc_i <- match.call(`[.indexed_db`)$i
+  #mc_i <- substitute(i)
   if(is.character(mc_i))  
     mc_i <- parse(text=mc_i)
   i <- eval(mc_i, envir=as.list(x,rev(sys.frames())), enclos=parent.frame())
