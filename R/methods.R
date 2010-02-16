@@ -12,7 +12,9 @@
 # method to allow R-style subsetting using
 # unquoted boolean operations
 
-`[.indexed_db` <- function(x, i, j, envir=.IndexEnv, ...) {
+`[.indexed_db` <- function(x, i, j, group, envir=.IndexEnv, ...) {
+  if(!missing(group))
+    return(match.call(`[.indexed_db`))
   mc_i <- match.call(`[.indexed_db`)$i
   if(is.character(mc_i))  
     mc_i <- parse(text=mc_i)

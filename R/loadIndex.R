@@ -45,4 +45,5 @@ loadIndex <- function(column,
     if(file.exists(levels_path))
       envir[[column[i]]]$l <- mmap(levels_path, mode=omode[[i]])
   }
+  invisible(envir)
 }
