@@ -42,8 +42,14 @@ loadIndex <- function(column,
 
     # levels exist for non-numeric data (char -> factor)
     levels_path <- paste(column[i], "levels.bin", sep="_")
-    if(file.exists(levels_path))
-      envir[[column[i]]]$l <- mmap(levels_path, mode=omode[[i]])
+    if(file.exists(levels_path)) {
+      # currenly hard coded to 1mm levels, need to fix
+      l <- readBin(levels_path, character(), 1e6)
+      envir[[column[i]]]$l <- l
+      extractFUN(envir[[column[i]]]$d) <- function(x) {
+        structure(x, levels=l, class='factor')
+      }
+    }
   }
   invisible(envir)
 }

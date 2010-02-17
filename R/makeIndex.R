@@ -1,5 +1,7 @@
 addIndex <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
+  if(file.exists(paste(column,"sorted.bin",sep="_")))
+    stop("data already exists. Remove disk structure or use 'loadIndex'")
   UseMethod("addIndex")
 }
 

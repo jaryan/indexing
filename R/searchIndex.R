@@ -1,5 +1,5 @@
 searchIndex <-
-function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE) {
+function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE, count=FALSE) {
   if(missing(column) || !is.character(column))
     stop("column must be specified as character string")
   .x <- env[[column]]
@@ -37,7 +37,7 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE) {
   
     if(type %in% c("=","==","!=",">","<="))
       x_end   <- binsearch(x, s_final_index, FALSE)
-  
+
     if(type %in% c("=", "==", "!=")) {
       i <- .Call("R_memcpy", final_index, x_start, x_end)
       if(type == "!=")
@@ -73,5 +73,10 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE) {
   if(length(i)==2 && i[2] < i[1])
     return(logical(0))
 
+  if(count)
+    return(length(i))
+#  bitmap <- bit(length(.x$d))
+#  bitmap[i] <- TRUE
+#  bitmap
   structure(.x$o[i], class="rowid")
 }
