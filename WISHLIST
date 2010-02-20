@@ -1,0 +1,10 @@
+o  add non-indexed search (full scan)
+o  add sample data (generated)
+o  make sure Ops methods as flippable
+o  query optimization
+o  order= to [.indexed_db
+o  add qsubset for character-based i and j
+o  add subset to work like [.indexed_db
+o  think about adding in-memory and support
+   for 'ff' or 'bigmemory'
+o  bitmap index of result -- keep out of R...
