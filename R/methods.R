@@ -12,7 +12,13 @@
 # method to allow R-style subsetting using
 # unquoted boolean operations
 
-`[.indexed_db` <- function(x, i, j, group, count=FALSE, envir=.IndexEnv, ...) {
+# need to add a subset() or other method to create
+# pre-compiled queries, to alleviate the very complicated
+# scope/lookup that is taking place here.
+#  i <- "strike == 15"
+#  db[i] _should work_ (it doesn't now)
+
+`[.indexed_db` <- function(x, i, j, group, order, count=FALSE, envir=.IndexEnv, ...) {
   if(!missing(group))
     return(match.call(`[.indexed_db`))
   mc_i <- match.call(`[.indexed_db`)$i
@@ -44,16 +50,20 @@
 #    if(is.bit(i))
 #      i <- as.which(i)
     for(v in 1:length(vars)) {
+      VAR <- NULL
       if(exists(vars[v], envir=envir) && 
          inherits(get(vars[v],envir=envir),"indexed")) {
         VAR <- get(vars[v], envir=envir)[['d']][i]
       } else {
+        # if not in 'database' look up frames until we find
         for(f in rev(sys.frames())) {
           if(exists(vars[v],envir=f)) {
             VAR <- get(vars[v], envir=f)
             break
           }
         }
+        if(is.null(VAR))
+          stop(paste("variable",vars[v],"not found")) 
       }
       assign(vars[v], 
              VAR,
@@ -127,4 +137,3 @@
 `%r%.indexed` <- function(e1, e2) {
   searchIndex(deparse(substitute(e1)), e2)
 }
-

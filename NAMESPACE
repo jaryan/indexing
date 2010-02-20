@@ -10,6 +10,12 @@ export(
   "%r%"
 )
 
+export(
+  # general utility functions
+
+  localtime
+)
+
 S3method(addIndex, integer)
 S3method(addIndex, double)
 S3method(addIndex, character)
@@ -21,6 +27,12 @@ S3method(">=", "indexed")
 S3method("==", "indexed")
 S3method("!=", "indexed")
 S3method("%r%", "indexed")
+
+# indexed_posixct
+S3method("==", "indexed_posixct")
+
+# indexed_date
+S3method("==", "indexed_date")
 
 S3method("[", "indexed_db")
 
