@@ -18,10 +18,11 @@
 #  i <- "strike == 15"
 #  db[i] _should work_ (it doesn't now)
 
-`[.indexed_db` <- function(x, i, j, group, order, count=FALSE, envir=.IndexEnv, ...) {
+`[.indexed_db` <- function(x, i, j, group, order, count=FALSE, ...) {
   if(!missing(group))
     return(match.call(`[.indexed_db`))
   mc_i <- match.call(`[.indexed_db`)$i
+  envir <- x
   if(count) {
     # query optimizer; move large count results to smallest
     # table possible then rerun
@@ -39,6 +40,8 @@
   if(is.character(mc_i))  
     mc_i <- parse(text=mc_i)
   i <- eval(mc_i, envir=as.list(x,rev(sys.frames())), enclos=parent.frame())
+  if(missing(j))
+    return(structure(i, class="rowid"))
   if(!missing(j)) {
     mc_j <- match.call(`[.indexed_db`)$j
     if(is.character(mc_j)) 
