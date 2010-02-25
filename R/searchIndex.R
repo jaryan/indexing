@@ -1,7 +1,9 @@
 searchIndex <-
 function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE, count=FALSE) {
-  if(missing(column) || !is.character(column))
+  if(missing(column))
     stop("column must be specified as character string")
+  if(!is.character(column))
+    column <- deparse(substitute(column))
   .x <- env[[column]]
   binsearch <- xts:::binsearch
 
@@ -76,7 +78,7 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE, count=FALSE)
   if(count)
     return(length(i))
 #  bitmap <- bit(length(.x$d))
-#  bitmap[i] <- TRUE
-#  bitmap
-  structure(.x$o[i], class="rowid")
+#  bitmap[.x$o[i]] <- TRUE
+  bitmap <- NULL
+  structure(.x$o[i],bitmap=bitmap, len=length(.x$d), class="rowid")
 }

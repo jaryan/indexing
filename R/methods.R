@@ -2,7 +2,18 @@
 # results
 
 `|.rowid` <- function(e1,e2) {
-  structure(unique(c(e1,e2)), class="rowid")
+  # use of bitmap indexing is very experimental. No clear idea of 
+  # best way to implement this yet
+  if(!is.null(attr(e1,"bitmap"))) {
+    b1 <- attr(e1,"bitmap")
+  }
+  if(!is.null(attr(e2,"bitmap"))) {
+    b2 <- b1 | attr(e2,"bitmap")
+  }
+  if(!is.null(attr(e2,"bitmap")) && !is.null(attr(e1,"bitmap"))) {
+    message('using bitmaps')
+    structure(as.which(b2), bitmap=b2, class="rowid")
+  } else structure(unique(c(e1,e2)), class="rowid")
 }
 
 `&.rowid` <- function(e1,e2) {
@@ -17,8 +28,51 @@
 # scope/lookup that is taking place here.
 #  i <- "strike == 15"
 #  db[i] _should work_ (it doesn't now)
+qsubset <- function(x, i, j, ...) {
+  if(!inherits(x, "indexed_db"))
+    stop("'qsubset' requires an indexed_db object")
+  envir <- x
+  i <- parse(text=i,srcfile=FALSE)
+  i <- eval(i, envir=as.list(x,rev(sys.frames())), enclos=parent.frame())
+  if(missing(j))
+    return(structure(i, class="rowid"))
+  if(!missing(j)) {
+    j <- parse(text=j, srcfile=FALSE)
+    vars <- all.vars(j)
+    tmp.env <- new.env()
+    for(v in 1:length(vars)) {
+      VAR <- NULL
+      if(exists(vars[v], envir=envir) && 
+         inherits(get(vars[v],envir=envir),"indexed")) {
+        VAR <- get(vars[v], envir=envir)[['d']][i]
+      } else {
+        # if not in 'database' look up frames until we find
+        for(f in rev(sys.frames())) {
+          if(exists(vars[v],envir=f)) {
+            VAR <- get(vars[v], envir=f)
+            break
+          }
+        }
+        if(is.null(VAR))
+          stop(paste("variable",vars[v],"not found")) 
+      }
+      assign(vars[v], 
+             VAR,
+             tmp.env)
+             #get(vars[v],
+             #    envir=envir)[['d']][i], tmp.env)
+    }
+    eval(j, envir=tmp.env)
+  } else i
+}
 
-`[.indexed_db` <- function(x, i, j, group, order, count=FALSE, ...) {
+# could use something like this to run count automatically to get smallest subset
+# from disk.  Expense of linear search on subset in-memory has some B/E point with
+# AND/OR using interesect/c. bitmap indexing internal will better this though
+# eval(eval(parse(text=paste("as.call(expression(`", FUN, "`,'",VAR,"',38,count=TRUE))",sep=""))))
+# [1] 9988
+
+subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order, count=FALSE, ...) {
   if(!missing(group))
     return(match.call(`[.indexed_db`))
   mc_i <- match.call(`[.indexed_db`)$i
@@ -37,8 +91,6 @@
                 envir=as.list(tmp.env,rev(sys.frames())),
                 enclos=parent.frame()))
   }
-  if(is.character(mc_i))  
-    mc_i <- parse(text=mc_i)
   i <- eval(mc_i, envir=as.list(x,rev(sys.frames())), enclos=parent.frame())
   if(missing(j))
     return(structure(i, class="rowid"))

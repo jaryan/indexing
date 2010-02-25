@@ -7,7 +7,8 @@ export(
   loadIndex,
   searchIndex,
 
-  "%r%"
+  "%r%",
+  qsubset
 )
 
 export(
@@ -27,6 +28,8 @@ S3method(">=", "indexed")
 S3method("==", "indexed")
 S3method("!=", "indexed")
 S3method("%r%", "indexed")
+
+S3method(subset, "indexed_db")
 
 # indexed_posixct
 S3method("==", "indexed_posixct")
