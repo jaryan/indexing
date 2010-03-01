@@ -44,11 +44,15 @@ loadIndex <- function(column,
     # load sorted data
     if(verbose > 1)
       message(paste("loading sorted",sQuote(column[i])))
-    envir[[column[i]]]$s <- mmap(sorted_path, mode=mode[[i]])
+    envir[[column[i]]]$s <- mmap(sorted_path, 
+                                 mode=mode[[i]],
+                                 prot=mmapFlags("PROT_READ"))
     # load order
     if(verbose > 1)
       message(paste("loading index",sQuote(column[i])))
-    envir[[column[i]]]$o <- mmap(ordered_path, mode=omode[[i]])
+    envir[[column[i]]]$o <- mmap(ordered_path, 
+                                 mode=omode[[i]],
+                                 prot=mmapFlags("PROT_READ"))
   
     # rle is an experimental/alternate index search scheme
     rle_path <- paste(column[i], "rle.bin", sep="_")

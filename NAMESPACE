@@ -32,7 +32,7 @@ S3method("%r%", "indexed")
 S3method(subset, "indexed_db")
 
 # indexed_posixct
-S3method("==", "indexed_posixct")
+S3method(Ops, "indexed_posixct")
 
 # indexed_date
 S3method("==", "indexed_date")

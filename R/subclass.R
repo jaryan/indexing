@@ -7,13 +7,13 @@
 #           for special handling of `==`,
 #           `>=`, `<=`, `!=`, `>`, and `<`methods
 
-`==.indexed_posixct` <- function(e1,e2) {
+`Ops.indexed_posixct` <- function(e1,e2) {
   e <- integer()
   if (inherits(e1, "indexed")) {
     for (i in 1:length(e2)) {
       e <- c(e, searchIndex(deparse(substitute(e1)), 
           as.numeric(as.POSIXct(e2[i])), 
-        "="))
+        .Generic))
       e <- unique(e)
     }   
   }   
