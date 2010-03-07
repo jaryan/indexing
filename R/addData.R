@@ -1,11 +1,11 @@
-addData <-
+createData <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
   if(file.exists(paste(column,"data.bin",sep="_")))
     stop("data already exists. Remove disk structure or use 'loadIndex'")
-  UseMethod("addData")
+  UseMethod("createData")
 }
 
-addData.integer <-
+createData.integer <-
 function(x, column=NULL, mode=integer(), envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
@@ -15,7 +15,7 @@ function(x, column=NULL, mode=integer(), envir=.IndexEnv, ...) {
   envir[[column]]$d <- mmap(file=paste(column,"data.bin",sep="_"))
 }
 
-addData.double <-
+createData.double <-
 function(x, column=NULL, mode=double(), envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
@@ -24,7 +24,7 @@ function(x, column=NULL, mode=double(), envir=.IndexEnv, ...) {
   envir[[column]]$d <- mmap(file=paste(column,"data.bin",sep="_"),mode=mode)
 }
 
-addData.character <-
+createData.character <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))

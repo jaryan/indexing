@@ -1,3 +1,4 @@
+loadData <- function() stop("not yet implemented")
 loadIndex <- function(column,
                       mode=int32(),
                       subclass=NULL,

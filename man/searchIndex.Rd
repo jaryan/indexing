@@ -102,7 +102,7 @@ User beware!
 pwd <- getwd()
 setwd(tempdir())
 a <- sample(100L, 1000, TRUE)
-addIndex(a)
+createIndex(a)
 searchIndex('a', 33)
 a[searchIndex('a', 33)]
 rm(a)

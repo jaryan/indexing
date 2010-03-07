@@ -1,11 +1,15 @@
-addIndex <-
+createIndex <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
+  if(missing(column)) 
+    column <- deparse(substitute(x))
+  if(is.character(x) && length(x) == 1)
+    stop("createIndex requires 'x' to be a data object")
   if(file.exists(paste(column,"sorted.bin",sep="_")))
     stop("data already exists. Remove disk structure or use 'loadIndex'")
-  UseMethod("addIndex")
+  UseMethod("createIndex")
 }
 
-addIndex.integer <-
+createIndex.integer <-
 function(x, column=NULL, mode=integer(), envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
@@ -18,9 +22,10 @@ function(x, column=NULL, mode=integer(), envir=.IndexEnv, ...) {
   envir[[column]]$s <- mmap(file=paste(column,"_sorted.bin",sep=""))
    writeBin(envir[[column]]$o, paste(column,"_ordered.bin",sep=""))
   envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""))
+  envir
 }
 
-addIndex.double <-
+createIndex.double <-
 function(x, column=NULL, mode=double(), envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
@@ -33,9 +38,10 @@ function(x, column=NULL, mode=double(), envir=.IndexEnv, ...) {
   envir[[column]]$s <- mmap(file=paste(column,"_sorted.bin",sep=""),mode=mode)
    writeBin(envir[[column]]$o, paste(column,"_ordered.bin",sep=""))
   envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""),mode=integer())
+  envir
 }
 
-addIndex.character <-
+createIndex.character <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
@@ -57,5 +63,5 @@ function(x, column=NULL, envir=.IndexEnv, ...) {
     writeBin(x, paste(column,"_levels.bin",sep=""))
     envir[[column]]$l <- x
   } else x <- NULL
+  envir
 }
-

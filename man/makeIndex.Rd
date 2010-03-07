@@ -1,5 +1,5 @@
-\name{addIndex}
-\alias{addIndex}
+\name{createIndex}
+\alias{createIndex}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Create Query Index
@@ -9,13 +9,13 @@ Index an R object in memory and save to disk. This is an S3
 method with methods for common types in R.
 }
 \usage{
-addIndex(x, column = NULL, envir = .IndexEnv, ...)
+createIndex(x, column = NULL, envir = .IndexEnv, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
 \R object to be indexed.  Atomic types or can be a type
-that has a \code{addIndex} method.
+that has a \code{createIndex} method.
 }
   \item{column}{
 Optional column name. If omitted, it is derived from the \code{x}
@@ -41,7 +41,7 @@ It is possible to use all in-memory objects, though the performance
 gain is negligible, and in many tests turns out to be negative.
 
 The objects used by \pkg{indexing} are stored in the \code{envir}
-specified to addIndex. Internal to this are objects named
+specified to createIndex. Internal to this are objects named
 according to the column name derived from the object symbol, or
 specified with \code{column}. This object is a list
 including components for the \pkg{mmap} objects corresponding
@@ -65,7 +65,7 @@ Original data is saved as
 \sQuote{column_levels.bin}.
 
 The final environment object that is set-up or eventually modified during
-subseqeunt calls to \code{addIndex} on new columns is used by
+subseqeunt calls to \code{createIndex} on new columns is used by
 \sQuote{searchIndex} internally to find matching data for a given
 criteria in k * O(log(n)) time, where \code{k} is dependent on the
 number of criteria inherent in the query.

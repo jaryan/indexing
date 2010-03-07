@@ -2,9 +2,12 @@ useDynLib(indexing)
 
 export(
   .IndexEnv,
+  indexenv,
 
-  addIndex,
+  createIndex,
+  createData,
   loadIndex,
+  loadData,
   searchIndex,
 
   "%r%",
@@ -17,9 +20,9 @@ export(
   localtime
 )
 
-S3method(addIndex, integer)
-S3method(addIndex, double)
-S3method(addIndex, character)
+S3method(createIndex, integer)
+S3method(createIndex, double)
+S3method(createIndex, character)
 
 S3method("<",  "indexed")
 S3method("<=", "indexed")
