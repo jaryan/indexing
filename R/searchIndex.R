@@ -5,7 +5,13 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE, count=FALSE)
   if(!is.character(column))
     column <- deparse(substitute(column))
   .x <- env[[column]]
-  binsearch <- xts:::binsearch
+  binsearch <-
+  function (key, vec, start = TRUE) 
+  {
+    # code is from the xts package
+    .Call("binsearch", as.double(key), vec, start, PKG="indexing")
+  }
+
 
   if(length(x) == 2) { # range query
     if(missing(type))
