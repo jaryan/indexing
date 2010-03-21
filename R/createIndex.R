@@ -1,16 +1,38 @@
 createIndex <-
-function(x, column=NULL, envir=.IndexEnv, ...) {
+function(x, column=NULL, type="mmap", force=FALSE, envir=.IndexEnv, ...) {
   if(missing(column)) 
     column <- deparse(substitute(x))
   if(is.character(x) && length(x) == 1)
     stop("createIndex requires 'x' to be a data object")
   if(file.exists(paste(column,"sorted.bin",sep="_")))
-    stop("data already exists. Remove disk structure or use 'loadIndex'")
-  UseMethod("createIndex")
+    if(!force)
+      stop("data already exists. Remove disk structure or use 'loadIndex'")
+  get(paste("createIndex",type,sep="."))(x=x,column=column,envir=envir,...)
 }
 
-createIndex.integer <-
-function(x, column=NULL, mode=integer(), envir=.IndexEnv, ...) {
+createIndex.mmap <- function(x, column, force, envir, ...) {
+  UseMethod("createIndex.mmap")
+}
+createIndex.mem <- function(x, column, force, envir, ...) {
+  stop("no memory indexing implemented yet: use type='mmap'")
+}
+
+createIndex.mmap.integer <-
+function(x, column, mode=integer(), force=FALSE, envir=.IndexEnv, ...) {
+  envir[[column]] <- structure(list(),class="indexed")
+  writeBin(x, paste(column,"data.bin",sep="_"))
+  envir[[column]]$d <- mmap(file=paste(column,"data.bin",sep="_"))
+  envir[[column]]$o <- order(x)
+  tmp.s <- as.integer(x[envir[[column]]$o])
+   writeBin(tmp.s, paste(column,"_sorted.bin",sep=""))
+  envir[[column]]$s <- mmap(file=paste(column,"_sorted.bin",sep=""))
+   writeBin(envir[[column]]$o, paste(column,"_ordered.bin",sep=""))
+  envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""))
+  envir
+}
+
+createIndex.mem.integer <-
+function(x, column=NULL, mode=integer(), force=FALSE, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
   envir[[column]] <- structure(list(),class="indexed")
@@ -25,8 +47,8 @@ function(x, column=NULL, mode=integer(), envir=.IndexEnv, ...) {
   envir
 }
 
-createIndex.double <-
-function(x, column=NULL, mode=double(), envir=.IndexEnv, ...) {
+createIndex.mmap.double <-
+function(x, column=NULL, mode=double(), force=FALSE, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
   envir[[column]] <- structure(list(),class="indexed")
@@ -41,7 +63,7 @@ function(x, column=NULL, mode=double(), envir=.IndexEnv, ...) {
   envir
 }
 
-createIndex.character <-
+createIndex.mmap.character <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))

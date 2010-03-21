@@ -20,8 +20,12 @@
   structure(intersect(e1,e2), class="rowid")
 }
 
+print.rowid <- function(x, ...) {
+  print(unclass(x))
+}
+
 # method to allow R-style subsetting using
-# unquoted boolean operations
+# unquoted relational algebra
 
 # need to add a subset() or other method to create
 # pre-compiled queries, to alleviate the very complicated
@@ -106,9 +110,21 @@ subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order, count=FAL
 #      i <- as.which(i)
     for(v in 1:length(vars)) {
       VAR <- NULL
-      if(exists(vars[v], envir=envir) && 
-         inherits(get(vars[v],envir=envir),"indexed")) {
-        VAR <- get(vars[v], envir=envir)[['d']][i]
+      if(exists(vars[v], envir=envir)) {
+      #if(exists(vars[v], envir=envir) && 
+      #   inherits(get(vars[v],envir=envir),"indexed")) {
+        #VAR <- get(vars[v], envir=envir)[['d']][i]
+        VAR <- get(vars[v], envir=envir)
+        if(inherits(VAR,"indexed_list")) {
+          # loop over list of indexed data to get subsets
+          Var <- vector("list",length(VAR))
+          for(ii in 1:length(Var)) {
+            Var[[ii]] <- VAR[[ii]]$d[i[[ii]]]
+          }
+          VAR <- unlist(Var)
+        } else {
+          VAR <- VAR[['d']][i]
+        }
       } else {
         # if not in 'database' look up frames until we find
         for(f in rev(sys.frames())) {
@@ -189,6 +205,11 @@ subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order, count=FAL
 `%r%` <- function(e1, e2) {
   UseMethod("%r%") 
 }
+
 `%r%.indexed` <- function(e1, e2) {
   searchIndex(deparse(substitute(e1)), e2)
 }
+
+
+
+

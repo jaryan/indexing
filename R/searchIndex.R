@@ -4,14 +4,30 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE, count=FALSE)
     stop("column must be specified as character string")
   if(!is.character(column))
     column <- deparse(substitute(column))
-  .x <- env[[column]]
-  binsearch <-
-  function (key, vec, start = TRUE) 
+
+
+  if(inherits(env,"indexed_db")) {
+    .x <- env[[column]]
+    if(inherits(.x,"indexed_list")) {
+        rows <- lapply(.x,function(e) {
+                          searchIndex(column=column,x=x,
+                                      type=type,SIZE=SIZE,
+                                      env=e,range=range,count=count)
+                          }
+                )
+        # searchUnindex(column=column,x=x,type=type,env=.x)
+        return(rows)
+    }
+  } else
+  if(inherits(env,"indexed")) {
+    .x <- env
+  } else stop("'env' needs to be of class 'indexed_db' or 'indexed'")
+
+  binsearch <- function (key, vec, start = TRUE) 
   {
-    # code is from the xts package
+    # code is originally from the xts package
     .Call("binsearch", as.double(key), vec, start, PKG="indexing")
   }
-
 
   if(length(x) == 2) { # range query
     if(missing(type))

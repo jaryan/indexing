@@ -20,9 +20,9 @@ export(
   localtime
 )
 
-S3method(createIndex, integer)
-S3method(createIndex, double)
-S3method(createIndex, character)
+S3method(createIndex.mmap, integer)
+S3method(createIndex.mmap, double)
+S3method(createIndex.mmap, character)
 
 S3method("<",  "indexed")
 S3method("<=", "indexed")
@@ -44,3 +44,6 @@ S3method("[", "indexed_db")
 
 S3method("&", "rowid")
 S3method("|", "rowid")
+
+S3method(print, indexed_db)
+S3method(print, rowid)
