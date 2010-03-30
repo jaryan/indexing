@@ -12,7 +12,8 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE, count=FALSE)
         rows <- lapply(.x,function(e) {
                           searchIndex(column=column,x=x,
                                       type=type,SIZE=SIZE,
-                                      env=e,range=range,count=count)
+                                      env=structure(e,class="indexed"),
+                                      range=range,count=count)
                           }
                 )
         # searchUnindex(column=column,x=x,type=type,env=.x)

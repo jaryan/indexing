@@ -69,7 +69,7 @@ loadIndex <- function(column,
       l <- readBin(levels_path, character(), 1e6)
       envir[[column[i]]]$l <- l
       extractFUN(envir[[column[i]]]$d) <- function(x) {
-        structure(x, levels=l, class='factor')
+        as.character(structure(x, levels=l, class='factor'))
       }
     }
   }
