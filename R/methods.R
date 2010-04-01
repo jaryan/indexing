@@ -21,7 +21,11 @@
 }
 
 print.rowid <- function(x, ...) {
-  print(unclass(x))
+  nr <- length(unlist(x))
+  if(nr > 1)
+    message(paste(nr,'hits'))
+  else
+    message('1 hit')
 }
 
 # method to allow R-style subsetting using
@@ -76,7 +80,40 @@ qsubset <- function(x, i, j, ...) {
 # eval(eval(parse(text=paste("as.call(expression(`", FUN, "`,'",VAR,"',38,count=TRUE))",sep=""))))
 # [1] 9988
 
-subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order, count=FALSE, ...) {
+orderBy <- function(x, order.by) {
+  # internal use function to sort output columns
+  # currently only supports ascending sort order
+  order.by <- rev(order.by)
+  decr <- grepl("-",order.by)
+  order.by <- gsub("-","",order.by)
+  if(NCOL(x) > 1) {
+    temp.x <- x[order(x[[order.by[1]]],decreasing=decr[1]), ]
+    if (length(order.by) > 1) {
+        for (i in 2:length(order.by)) {
+            temp.x <- temp.x[order(temp.x[[order.by[i]]],decreasing=decr[i]), ]
+        }
+    }
+  } else {
+    # univariate series
+    temp.x <- x[order(x[[order.by[1]]],decreasing=decr[1])]
+    if (length(order.by) > 1) {
+        for (i in 2:length(order.by)) {
+            temp.x <- temp.x[order(temp.x[[order.by[i]]],decreasing=decr[i])]
+        }
+  }
+  }
+  temp.x
+# order.by <- rev(order.by)
+# temp.x <- x[order(x[[order.by[1]]]),]
+# if(length(order.by)>1) {
+#   for(i in 2:length(order.by)) {
+#     temp.x <- temp.x[order(temp.x[[order.by[i]]]),]
+#   }
+# }
+# temp.x
+}
+
+subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order., limit, count=FALSE, ...) {
   if(!missing(group))
     return(match.call(`[.indexed_db`))
   mc_i <- match.call(`[.indexed_db`)$i
@@ -96,10 +133,22 @@ subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order, count=FAL
                 enclos=parent.frame()))
   }
   i <- eval(mc_i, envir=as.list(x,rev(sys.frames())), enclos=parent.frame())
-  if(missing(j))
+ 
+  # if db[condition] simply return rows, with print.rowid showing
+  # the equivelent of count(*) in SQL
+  if(nargs()==2)
     return(structure(i, class="rowid"))
-  if(!missing(j)) {
-    mc_j <- match.call(`[.indexed_db`)$j
+
+  if(TRUE) {
+    if(!missing(j)) {
+      mc_j <- match.call(`[.indexed_db`)$j
+    } else {
+      # if db[condition,] return the matching rows as [.data.frame would
+      mc_j <- parse(text=paste("data.frame(",
+                               paste(ls(envir),collapse=","),
+                               ")"),
+                    srcfile=NULL) 
+    }
     if(is.character(mc_j)) 
       mc_j <- parse(text=mc_j)
     # j should be the column list in .IndexEnv, $d the data
@@ -117,7 +166,7 @@ subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order, count=FAL
         VAR <- get(vars[v], envir=envir)
         if(inherits(VAR,"indexed_list")) {
           # loop over list of indexed data to get subsets
-          Var <- vector("list",length(VAR))
+          Var <- vector("list",length(unclass(VAR)))
           for(ii in 1:length(Var)) {
             Var[[ii]] <- VAR[[ii]]$d[i[[ii]]]
           }
@@ -142,7 +191,16 @@ subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order, count=FAL
              #get(vars[v],
              #    envir=envir)[['d']][i], tmp.env)
     }
-    eval(mc_j, envir=tmp.env)
+    res <- eval(mc_j, envir=tmp.env)
+    if(!missing(order.))
+      res <- orderBy(res,order.)
+
+    if(!missing(limit)) {
+      if(is.null(dim(res)))
+        res <- res[1:limit]
+      else res <- res[1:limit,]
+    }
+    res
   }
   else i
 }
@@ -210,6 +268,8 @@ subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order, count=FAL
   searchIndex(deparse(substitute(e1)), e2)
 }
 
-
+`%r%.numeric` <- function(e1,e2) {
+  which(e1 > e2[1] & e1 < e2[2])
+}
 
 

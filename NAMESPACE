@@ -31,6 +31,9 @@ S3method(">=", "indexed")
 S3method("==", "indexed")
 S3method("!=", "indexed")
 S3method("%r%", "indexed")
+S3method("%r%", "numeric")
+
+S3method(length, "indexed")
 
 S3method(subset, "indexed_db")
 

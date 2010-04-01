@@ -70,6 +70,8 @@ function(x, column=NULL, envir=.IndexEnv, ...) {
   if(!is.numeric(x))
     x <- as.factor(x)
   envir[[column]] <- structure(list(),class="indexed")
+  writeBin(as.integer(x), paste(column,"data.bin",sep="_"))
+  envir[[column]]$d <- mmap(file=paste(column,"data.bin",sep="_"),mode=integer())
   envir[[column]]$o <- order(x)
   tmp.s <- as.integer(x[envir[[column]]$o])
    writeBin(tmp.s, paste(column,"_sorted.bin",sep=""))
