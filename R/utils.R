@@ -15,7 +15,11 @@ length.indexed <- function(x) {
 
 print.indexed_db <- function(x, ...) {
   objects <- ls(x)
-  NR <- length(get(objects[1],x))
-  NC <- length(objects)
+  if(length(objects) > 0) {
+    NR <- length(get(objects[1],x))
+    NC <- length(objects)
+  } else {
+    NR <- NC <- 0L
+  }
   cat("Indexed Environment:",NR,"rows by",NC,"columns\n")
 }
