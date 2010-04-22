@@ -1,4 +1,42 @@
-loadData <- function() stop("not yet implemented")
+loadData  <- function(column,
+                      mode=int32(),
+                      subclass=NULL,
+                      omode=int32(),
+                      dir=NULL,
+                      verbose=0,
+                      envir=.IndexEnv, ...) {
+  if(!is.list(subclass))
+    subclass <- list(subclass)
+  subclass <- rep(subclass, length.out=length(column))
+  if(!is.list(mode))
+    mode <- list(mode)
+  mode <- rep(mode, length.out=length(column))
+  if(!is.list(omode))
+    omode <- list(omode)
+  omode <- rep(omode, length.out=length(column))
+  for(i in 1:length(column)) {
+    if(!is.null(subclass[[i]]))
+      subclass[[i]] <- paste("indexed",subclass[[i]],sep="_") 
+    envir[[column[i]]] <- structure(list(), 
+                                    class=c(subclass[[i]],"indexed"))
+    # each column in the envir contains a list of entries:
+    #  d: original data mapping
+    #  s: sorted data
+    #  o: ordered data (location of sorted in data)
+    #  
+    #  optional:
+    #    rle: run-length encoded vector
+    #      l: levels for character/factor
+    data_path <- paste(column[i], "data.bin", sep="_")
+    if(file.exists(data_path)) {
+      if(verbose)
+        message(paste("loading data",sQuote(column[i])))
+      envir[[column[i]]]$d <- mmap(data_path, mode=mode[[i]])
+    }
+  }
+  invisible(envir)
+}
+
 loadIndex <- function(column,
                       mode=int32(),
                       subclass=NULL,

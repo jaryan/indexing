@@ -1,33 +1,3 @@
-# methods to allow logical combining of searchIndex
-# results
-
-`|.rowid` <- function(e1,e2) {
-  # use of bitmap indexing is very experimental. No clear idea of 
-  # best way to implement this yet
-  if(!is.null(attr(e1,"bitmap"))) {
-    b1 <- attr(e1,"bitmap")
-  }
-  if(!is.null(attr(e2,"bitmap"))) {
-    b2 <- b1 | attr(e2,"bitmap")
-  }
-  if(!is.null(attr(e2,"bitmap")) && !is.null(attr(e1,"bitmap"))) {
-    message('using bitmaps')
-    structure(as.which(b2), bitmap=b2, class="rowid")
-  } else structure(unique(c(e1,e2)), class="rowid")
-}
-
-`&.rowid` <- function(e1,e2) {
-  structure(intersect(e1,e2), class="rowid")
-}
-
-print.rowid <- function(x, ...) {
-  nr <- length(unlist(x))
-  if(nr > 1)
-    message(paste(nr,'hits'))
-  else
-    message('1 hit')
-}
-
 # method to allow R-style subsetting using
 # unquoted relational algebra
 
@@ -113,7 +83,8 @@ orderBy <- function(x, order.by) {
 # temp.x
 }
 
-subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order., limit, count=FALSE, ...) {
+subset.indexed_db <- `[.indexed_db` <- 
+function(x, i, j, group, order., limit, count=FALSE, ...) {
   if(!missing(group))
     return(match.call(`[.indexed_db`))
   mc_i <- match.call(`[.indexed_db`)$i
@@ -136,7 +107,8 @@ subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order., limit, c
  
   # if db[condition] simply return rows, with print.rowid showing
   # the equivelent of count(*) in SQL
-  if(nargs()==2)
+
+  if((length(i)==0 && nargs()==2) || nargs()==2)
     return(structure(i, class="rowid"))
 
   if(TRUE) {
@@ -265,11 +237,15 @@ subset.indexed_db <- `[.indexed_db` <- function(x, i, j, group, order., limit, c
 }
 
 `%r%.indexed` <- function(e1, e2) {
-  searchIndex(deparse(substitute(e1)), e2)
+  searchIndex(deparse(substitute(e1)), e2, type="%r%")
 }
 
 `%r%.numeric` <- function(e1,e2) {
   which(e1 > e2[1] & e1 < e2[2])
+}
+
+`%r%.mmap` <- function(e1,e2) {
+  intersect(e1 > e2[1],e1 < e2[2])
 }
 
 

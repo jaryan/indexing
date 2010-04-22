@@ -11,7 +11,11 @@ export(
   searchIndex,
 
   "%r%",
-  qsubset
+  qsubset,
+
+  ## dimnames and dim to simulate rectangular
+  dimnames.indexed_db,
+  dim.indexed_db
 )
 
 export(
@@ -32,6 +36,7 @@ S3method("==", "indexed")
 S3method("!=", "indexed")
 S3method("%r%", "indexed")
 S3method("%r%", "numeric")
+S3method("%r%", "mmap")
 
 S3method(length, "indexed")
 
