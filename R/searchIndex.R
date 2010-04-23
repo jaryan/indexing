@@ -1,5 +1,8 @@
 searchIndex <-
 function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE, count=FALSE) {
+  if(type=="=")
+    type <- "=="
+
   if(missing(column))
     stop("column must be specified as character string")
   if(!is.character(column))
