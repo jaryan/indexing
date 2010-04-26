@@ -1,7 +1,11 @@
 searchIndex <-
-function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE, count=FALSE) {
+function(column, x, type='=', SIZE=1e5, env=.IndexEnv, 
+         range=FALSE, count=FALSE, parallel=FALSE) {
   if(type=="=")
     type <- "=="
+
+  if(!parallel)
+    mclapply <- lapply
 
   if(missing(column))
     stop("column must be specified as character string")
@@ -18,13 +22,14 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv, range=FALSE, count=FALSE)
     # elements as they are unique.  Return a list of rows
     # that match
     if(inherits(.x,"indexed_list")) {
-        rows <- lapply(.x,function(e) {
-                          searchIndex(column=column,x=x,
-                                      type=type,SIZE=SIZE,
-                                      env=structure(e,class="indexed"),
-                                      range=range,count=count)
-                          }
+      rows <- mclapply(1:length(unclass(.x)),function(e) {
+                       searchIndex(column=column,x=x,
+                                   type=type,SIZE=SIZE,
+                                   env=structure(.x[[e]],class="indexed"),
+                                   range=range,count=count)
+                       }
                 )
+        class(rows) <- "rowid"
         return(rows)
     }
   } else

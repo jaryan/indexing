@@ -19,6 +19,8 @@ length.indexed <- function(x) {
   }
 }
 
+seq.indexed_list <- function(x) seq(length(unclass(x)))
+
 print.indexed_db <- function(x, ...) {
   objects <- ls(x)
   if(length(objects) > 0) {

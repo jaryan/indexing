@@ -27,7 +27,8 @@ function(x, column, mode=integer(), force=FALSE, envir=.IndexEnv, ...) {
    writeBin(tmp.s, paste(column,"_sorted.bin",sep=""))
   envir[[column]]$s <- mmap(file=paste(column,"_sorted.bin",sep=""))
    writeBin(envir[[column]]$o, paste(column,"_ordered.bin",sep=""))
-  envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""))
+  #envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""))
+  envir[[column]]$o <- seqfile(file=paste(column,"_ordered.bin",sep=""),int32())
   envir
 }
 
@@ -59,7 +60,8 @@ function(x, column=NULL, mode=double(), force=FALSE, envir=.IndexEnv, ...) {
    writeBin(tmp.s, paste(column,"_sorted.bin",sep=""))
   envir[[column]]$s <- mmap(file=paste(column,"_sorted.bin",sep=""),mode=mode)
    writeBin(envir[[column]]$o, paste(column,"_ordered.bin",sep=""))
-  envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""),mode=integer())
+  #envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""),mode=integer())
+  envir[[column]]$o <- seqfile(file=paste(column,"_ordered.bin",sep=""),mode=integer())
   envir
 }
 
@@ -77,7 +79,8 @@ function(x, column=NULL, envir=.IndexEnv, ...) {
    writeBin(tmp.s, paste(column,"_sorted.bin",sep=""))
   envir[[column]]$s <- mmap(file=paste(column,"_sorted.bin",sep=""))
    writeBin(envir[[column]]$o, paste(column,"_ordered.bin",sep=""))
-  envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""))
+  #envir[[column]]$o <- mmap(file=paste(column,"_ordered.bin",sep=""))
+  envir[[column]]$o <- seqfile(file=paste(column,"_ordered.bin",sep=""), integer())
   if(is.factor(x)) {
      writeBin(as.integer(rle(tmp.s)$length),paste(column,"_rle.bin",sep=""))
      envir[[column]]$rle <- readBin(paste(column,"_rle.bin",sep=""),integer(),10000)
