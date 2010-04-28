@@ -3,8 +3,7 @@
 # for $o[] extraction from disk in searchIndex
 
 seqfile <- function(file, mode) {
-  f <- base::file(file, open="rb")
-  structure(list(data=f, 
+  structure(list(data=file, 
                  bytes=as.integer(file.info(file)$size),
                  filedesc=structure(as.integer(f), .Names=file),
                  storage.mode=as.Ctype(mode)
@@ -13,11 +12,15 @@ seqfile <- function(file, mode) {
 }
 
 `[.seqfile` <- function(x, i, ...) {
+  if(length(i)==0)
+    return(logical(0))
+  f <- base::file(x$data, open="rb")
   bytes <- nbytes(x$storage.mode)
   seek(x$data, i[1] * bytes - bytes)
-  ret <- readBin(x$data, x$storage.mode, i[length(i)],
+  ret <- readBin(x$data, x$storage.mode, i[length(i)]-i[1]+1,
                  size=bytes, signed=attr(x$storage.mode,"signed"))
   seek(x$data, 0)
+  close(f)
   ret 
 }
 
