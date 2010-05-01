@@ -133,6 +133,7 @@ loadHIndex <- function(column,
                       mode=int32(),
                       subclass=NULL,
                       omode=int32(),
+                      lmode=NULL,
                       dir=NULL,
                       verbose=0,
                       envir=.IndexEnv, ...) {
@@ -212,15 +213,20 @@ loadHIndex <- function(column,
         # currenly hard coded to 1mm levels, need to fix
         if(verbose > 1)
           message(paste("loading levels",sQuote(column[i])))
-        l <- readBin(levels_path, character(), 1e6)
-        col$l <- l
-        extractFUN(col$d) <- function(x) {
-          as.character(structure(x, levels=l, class='factor'))
+        if(is.null(lmode)) { # in-memory factor
+          l <- readBin(levels_path, character(), 1e6)
+          col$l <- l
+          extractFUN(col$d) <- function(x) {
+            as.character(structure(x, levels=l, class='factor'))
+          }
+        } else { # disk-based factor (fixed width)
+          col$l <- mmap(levels_path, lmode)  # lmode=char(10) 
+          col$d <- structure(col$d, levels=col$l, class='dfactor')
         }
       }
       ilist <- append(ilist, list(col))
     } # end loop over h-partitioned columns
-    class(ilist) <- c("indexed_list","indexed")
+    class(ilist) <- c("indexed_list",subclass[[1]],"indexed")
     envir[[column[i]]] <- ilist
   }
   invisible(envir)

@@ -5,10 +5,14 @@
 seqfile <- function(file, mode) {
   structure(list(data=file, 
                  bytes=as.integer(file.info(file)$size),
-                 filedesc=structure(as.integer(f), .Names=file),
+                 filedesc=structure(NA, .Names=file),
                  storage.mode=as.Ctype(mode)
                 ),
             class="seqfile")
+}
+
+is.seqfile <- function(x) {
+  inherits(x, 'seqfile')
 }
 
 `[.seqfile` <- function(x, i, ...) {
@@ -16,10 +20,10 @@ seqfile <- function(file, mode) {
     return(logical(0))
   f <- base::file(x$data, open="rb")
   bytes <- nbytes(x$storage.mode)
-  seek(x$data, i[1] * bytes - bytes)
-  ret <- readBin(x$data, x$storage.mode, i[length(i)]-i[1]+1,
+  seek(f, i[1] * bytes - bytes)
+  ret <- readBin(f, x$storage.mode, i[length(i)]-i[1]+1,
                  size=bytes, signed=attr(x$storage.mode,"signed"))
-  seek(x$data, 0)
+  seek(f, 0)
   close(f)
   ret 
 }

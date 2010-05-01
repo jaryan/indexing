@@ -25,7 +25,8 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
       rows <- mclapply(1:length(unclass(.x)),function(e) {
                        searchIndex(column=column,x=x,
                                    type=type,SIZE=SIZE,
-                                   env=structure(.x[[e]],class="indexed"),
+                                   env=structure(.x[[e]],
+                                       class=class(.x[[e]])),
                                    range=range,count=count)
                        }
                 )
@@ -37,9 +38,8 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     .x <- env
   } else stop("'env' needs to be of class 'indexed_db' or 'indexed'")
 
-  binsearch <- function (key, vec, start = TRUE) # code is originally from the xts package
-  {
-    .Call("binsearch", as.double(key), vec, start, PKG="indexing")
+  binsearch <- function (key, vec, start = TRUE) {
+    .Call("binsearch", as.double(key), vec, start, PACKAGE="indexing")
   }
 
   if(is.null(.x$o)) {
@@ -54,8 +54,12 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     i <- seq(searchIndex(column, x[1], type=type[1], SIZE, env, range=TRUE),
              searchIndex(column, x[2], type=type[2], SIZE, env, range=TRUE))
   } else { # non-range query
-    if(!is.null(.x$l) && is.character(.x$l)) {
-      x <- which(x==.x$l) 
+    if(!is.null(.x$l) && 
+       (is.character(.x$l) || ( is.mmap(.x$l) && is.character(.x$l$storage.mode)))
+      ) {
+      x <- x==.x$l
+      if(length(x) > 0 && is.logical(x))
+        x <- which(x) 
     } 
     sparse_seq <- seq(1, length(.x$s), SIZE)
     if(sparse_seq[length(sparse_seq)] != length(.x$s))
@@ -118,10 +122,8 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
 
   if(count)
     return(length(i))
-#  bitmap <- bit(length(.x$d))
-#  bitmap[.x$o[i]] <- TRUE
-  bitmap <- NULL
   if(!is.null(.x$o))
     i <- .x$o[i]
-  structure(i,bitmap=bitmap, len=length(.x), class="rowid")
+  .Call("indexing_add_class", i, length(.x), "rowid")
+  #structure(i,bitmap=bitmap, len=length(.x), class="rowid")
 }
