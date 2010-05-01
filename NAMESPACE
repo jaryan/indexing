@@ -31,6 +31,9 @@ export(
 S3method('[', seqfile)
 S3method(print, seqfile)
 
+S3method('[', dfactor)
+S3method(print, dfactor)
+
 S3method(createIndex.mmap, integer)
 S3method(createIndex.mmap, double)
 S3method(createIndex.mmap, character)
