@@ -2,6 +2,7 @@ loadData  <- function(column,
                       mode=int32(),
                       subclass=NULL,
                       omode=int32(),
+                      lmode=NULL,
                       dir=NULL,
                       verbose=0,
                       envir=.IndexEnv, ...) {
@@ -41,6 +42,7 @@ loadIndex <- function(column,
                       mode=int32(),
                       subclass=NULL,
                       omode=int32(),
+                      lmode=NULL,
                       dir=NULL,
                       verbose=0,
                       envir=.IndexEnv, ...) {
@@ -103,13 +105,30 @@ loadIndex <- function(column,
     levels_path <- paste(column[i], "levels.bin", sep="_")
     if(file.exists(levels_path)) {
       # currenly hard coded to 1mm levels, need to fix
-      if(verbose > 1)
-        message(paste("loading levels",sQuote(column[i])))
-      l <- readBin(levels_path, character(), 1e6)
-      envir[[column[i]]]$l <- l
-      extractFUN(envir[[column[i]]]$d) <- function(x) {
-        as.character(structure(x, levels=l, class='factor'))
-      }
+        col <- envir[[column[i]]]
+        if(verbose > 1)
+          message(paste("loading levels",sQuote(column[i])))
+        if(is.null(lmode)) { # in-memory factor
+          l <- readBin(levels_path, character(), 1e6)
+          col$l <- l
+          e <- new.env()
+          e$l <- l
+          extractFUN(col$d) <- function(x) {
+            as.character(structure(x, levels=l, class='factor'))
+          }
+          environment(col$d$extractFUN) <- e
+        } else { # disk-based factor (fixed width)
+          col$l <- mmap(levels_path, lmode)  # lmode=char(10) 
+          col$d <- structure(col$d, levels=col$l, class='dfactor')
+        }
+        envir[[column[i]]] <- col
+#      if(verbose > 1)
+#        message(paste("loading levels",sQuote(column[i])))
+#      l <- readBin(levels_path, character(), 1e6)
+#      envir[[column[i]]]$l <- l
+#      extractFUN(envir[[column[i]]]$d) <- function(x) {
+#        as.character(structure(x, levels=l, class='factor'))
+#      }
     }
   }
   invisible(envir)
@@ -216,9 +235,12 @@ loadHIndex <- function(column,
         if(is.null(lmode)) { # in-memory factor
           l <- readBin(levels_path, character(), 1e6)
           col$l <- l
+          e <- new.env()
+          e$l <- l
           extractFUN(col$d) <- function(x) {
             as.character(structure(x, levels=l, class='factor'))
           }
+          environment(col$d$extractFUN) <- e
         } else { # disk-based factor (fixed width)
           col$l <- mmap(levels_path, lmode)  # lmode=char(10) 
           col$d <- structure(col$d, levels=col$l, class='dfactor')
@@ -229,5 +251,7 @@ loadHIndex <- function(column,
     class(ilist) <- c("indexed_list",subclass[[1]],"indexed")
     envir[[column[i]]] <- ilist
   }
+  envir$.Partitions <- sapply(ilist, length)
+  envir$.Paths <- column_path
   invisible(envir)
 }

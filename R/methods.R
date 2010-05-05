@@ -109,7 +109,8 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
   # the equivelent of count(*) in SQL
 
   if((length(i)==0 && nargs()==2) || nargs()==2)
-    return(structure(i, class="rowid"))
+    return(as.rowid(i))
+    #return(structure(i, class="rowid"))
 
   if(TRUE) {
     if(!missing(j)) {
@@ -140,11 +141,11 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
           # loop over list of indexed data to get subsets
           Var <- vector("list",length(unclass(VAR)))
           for(ii in 1:length(Var)) {
-            Var[[ii]] <- VAR[[ii]]$d[i[[ii]]]
+            Var[[ii]] <- VAR[[ii]]$d[as.rowid(i[[ii]])]
           }
           VAR <- unlist(Var)
         } else {
-          VAR <- VAR[['d']][i]
+          VAR <- VAR[['d']][as.rowid(i)]
         }
       } else {
         # if not in 'database' look up frames until we find
@@ -174,7 +175,7 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
     }
     res
   }
-  else i
+  else as.rowid(i)
 }
 
 `<.indexed` <- function(e1,e2) {
@@ -201,18 +202,14 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
   e <- integer()
   if(inherits(e1, 'indexed')) {
     for(i in 1:length(e2)) {
-      e <- c(e,searchIndex(deparse(substitute(e1)), e2[i], "="))
-      e <- unique(e)
+      e <- c(e,searchIndex(deparse(substitute(e1)), e2[i], "=="))
     }
-    #bitmap <- bit(length(e1$d))
   } else {
-    for(i in 1:length(e2)) {
-      e <- c(e,searchIndex(deparse(substitute(e1)), e2[i], "="))
-      e <- unique(e)
+    for(i in 1:length(e1)) {
+      e <- c(e,searchIndex(deparse(substitute(e2)), e1[i], "=="))
     }
-    #bitmap <- bit(length(e1$d))
   }
-  #bitmap[e] <- TRUE
+  #.Call("add_rowid_class", e)
   structure(e, class='rowid')
 }
 

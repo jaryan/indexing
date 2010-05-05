@@ -52,3 +52,19 @@ dim.indexed_db <- function(x) {
   }
   c(NR,NC)
 }
+
+partitions <- function(envir=.IndexEnv) {
+  envir$.Partitions
+}
+
+make_chunk <- function(n, envir=.IndexEnv) {
+  rowchunks <- rep(list(NULL), partitions(envir))
+  rowchunks[[n]] <- 1:partitions(envir)[n]
+  rowchunks
+}
+
+# use
+#
+#  tte <- lapply(1:11, function(x) db[make_chunk(x), expiry-dates])
+#
+#

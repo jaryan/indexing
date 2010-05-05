@@ -1,5 +1,6 @@
 #include <R.h>
 #include <Rinternals.h>
+#include <Rdefines.h>
 
 /* used throughout, so defined globally */
 int bitmask[32];
@@ -45,6 +46,7 @@ SEXP make_bitmap (SEXP _len) {
   SET_STRING_ELT(_class, 0, mkChar("bitmap"));
   SET_STRING_ELT(_class, 1, mkChar("rowid"));
   setAttrib(_zb, R_ClassSymbol, _class);
+  setAttrib(_zb, install("length"), _len);
 
   UNPROTECT(2);
   return _zb;   
@@ -126,37 +128,94 @@ SEXP bitmap_dlogical (SEXP _e1, SEXP _e2, SEXP _type) {
   return _e1;
 }
 
-SEXP which_bits (SEXP _bits) {
-  int i, b, count=0;
+SEXP which_bits (SEXP _bits, SEXP _hint) {
+  int i, b, b32, count=0, max_count=0;
   int *bits = INTEGER(_bits);
   int bits_len = length(_bits);
 
+  if(isNull(_hint)) {
   /* probably need some sort of block doubling 
      routine, as 32x a big vector is too big 
-     Here we opt to count first. About 15% overhead.
+     Here we opt to count first. About 100% overhead. FIXME
   */
   for(b=0; b<bits_len; b++) {
   for(i=0; i<32; i++) {
     if(bitmask[i] & bits[b]) {
-      count++;
+      max_count++;
     }
   }
+  }
+  } else {
+  /* use hint for count size */
+  max_count = INTEGER(_hint)[0];
   }
 
   SEXP _index;
-  PROTECT(_index=allocVector(INTSXP,count));
+  PROTECT(_index=allocVector(INTSXP,max_count));
   int *index = INTEGER(_index);
   count = 0;
-  for(b=0; b<bits_len; b++) {
-  for(i=0; i<32; i++) {
-    if(bitmask[i] & bits[b]) {
-      index[count] = i+(32*b)+1; 
-      count++;
+    for(b=0 ; b<bits_len; b++) {
+      b32 = b*32+1;
+      for(i=0; i<32; i++) {
+        if(bitmask[i] & bits[b]) {
+          //index[count] = i+(32*b)+1; 
+          index[count] = i+b32;
+          count++;
+        }
+      }
+    }
+  /* add class="rowid" */
+  SEXP _class;
+  PROTECT(_class = allocVector(STRSXP, 1));
+  SET_STRING_ELT(_class, 0, mkChar("rowid"));
+  setAttrib(_index, R_ClassSymbol, _class);
+
+  PROTECT(_index = lengthgets(_index, count));
+  UNPROTECT(3);
+  return _index;
+}
+
+SEXP which_bits_2 (SEXP _bits) {
+  int i, b, b32, ck, count=0, max_count=0;
+  int *bits = INTEGER(_bits);
+  int bits_len = length(_bits);
+
+  int bchunk = (int)((bits_len) / 5);
+  int bchunk_array[] = {bchunk, bchunk*2, bchunk*3, bchunk*4, bits_len};
+  int *index = Calloc(bchunk_array[4]*32, int);
+  int curr_len = bchunk*32;
+  count = 0, b=0;
+  for(ck=0; ck < 5; ck++) {
+    for(; b<bchunk_array[ck]; b++) {
+      b32 = b*32+1;
+      for(i=0; i<32; i++) {
+        if(bitmask[i] & bits[b]) {
+          //index[count] = i+(32*b)+1; 
+          index[count] = i+b32;
+          count++;
+        }
+      }
+    }
+    if(count + (bchunk*32) > curr_len) {
+      curr_len = curr_len + bchunk*32;
+      index = Realloc(index, curr_len, int);
     }
   }
-  }
-  UNPROTECT(1);
-  return _index;
+
+  /* copy locally allocated array into SEXP */
+  SEXP _ret;
+  PROTECT(_ret = allocVector(INTSXP, count));
+  memcpy(INTEGER(_ret), index, count*sizeof(int));
+  Free(index);
+
+  /* add class="rowid" */
+  SEXP _class;
+  PROTECT(_class = allocVector(STRSXP, 1));
+  SET_STRING_ELT(_class, 0, mkChar("rowid"));
+  setAttrib(_ret, R_ClassSymbol, _class);
+
+  UNPROTECT(2);
+  return _ret;
 }
 
 SEXP count_bits (SEXP _bits) {
@@ -174,7 +233,7 @@ SEXP count_bits (SEXP _bits) {
   return ScalarInteger(count);
 }
 
-SEXP bitmap_replace (SEXP _elem, SEXP _bitmap) {
+SEXP bitmap_true (SEXP _elem, SEXP _bitmap) {
   /* bitwise operation on select chunks
      of bitmap.  DONE IN PLACE!!! BEWARE!!!  */
   int i;
@@ -192,7 +251,71 @@ SEXP bitmap_replace (SEXP _elem, SEXP _bitmap) {
   return _bitmap;
 }
 
-SEXP bitmap_zero (SEXP _elem, SEXP _bitmap) {
+SEXP __bitmap_intersect (SEXP _x, SEXP _y, SEXP _bitmap) {
+  /* bitwise operation on select chunks
+     of bitmap.  DONE IN PLACE!!! BEWARE!!!  */
+  int i;
+  int off, chunk, len_x, len_y, count=0;
+  int *x      = INTEGER(_x),
+      *y      = INTEGER(_y),
+      *bitmap = INTEGER(_bitmap);
+  len_x = length(_x);
+  len_y = length(_y);
+
+  SEXP _intersection;
+  PROTECT(_intersection = allocVector(INTSXP, len_x+len_y));
+  int *intersection = INTEGER(_intersection);
+
+  /* bitwise OR to set bits given _x */
+  for(i = 0; i < len_x; i++) {
+    off = (int)((x[i]-1) % 32); 
+    chunk = (x[i]-1) / 32;
+    bitmap[chunk] = bitmap[chunk] | bitmask[off];
+  }
+
+  /* bitwise AND _y and bits set by _x */
+  for(i = 0; i < len_y; i++) {
+    off = (int)((y[i]-1) % 32); 
+    chunk = (y[i]-1) / 32;
+    if((bitmap[chunk] & bitmask[off]) == bitmask[off]) {
+      intersection[count] = y[i];
+      count++;
+    }
+  }
+
+  PROTECT(_intersection = lengthgets(_intersection, count));
+  UNPROTECT(2);
+  return _intersection;
+}
+
+SEXP bitmap_intersect (SEXP _elem, SEXP _bitmap) {
+  /* bitwise operation on select chunks
+     of bitmap.  DONE IN PLACE!!! BEWARE!!!  */
+  int i;
+  int off, chunk, len, count=0;
+  int *elem   = INTEGER(_elem),
+      *bitmap = INTEGER(_bitmap);
+  len = length(_elem);
+
+  SEXP _intersection;
+  PROTECT(_intersection = allocVector(INTSXP, 5000000));
+  int *intersection = INTEGER(_intersection);
+  
+
+  for(i = 0; i < len; i++) {
+    off = (int)((elem[i]-1) % 32); 
+    chunk = (elem[i]-1) / 32;
+    if((bitmap[chunk] & bitmask[off]) == bitmask[off]) {
+      intersection[count] = elem[i];
+      count++;
+    }
+  }
+
+  UNPROTECT(1);
+  return _intersection;
+}
+
+SEXP bitmap_false (SEXP _elem, SEXP _bitmap) {
   /* bitwise operation on select chunks
      of bitmap.  DONE IN PLACE!!! BEWARE!!!  */
   int i;

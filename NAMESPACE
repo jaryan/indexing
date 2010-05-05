@@ -16,7 +16,13 @@ export(
 
   ## dimnames and dim to simulate rectangular
   dimnames.indexed_db,
-  dim.indexed_db
+  dim.indexed_db,
+  partitions
+)
+
+export(
+  is.bitmap,
+  as.rowid
 )
 
 export(
@@ -27,6 +33,13 @@ export(
   # fast sequential binary file read with `[` method
   seqfile
 )
+
+S3method(as.rowid, rowid)
+S3method(as.rowid, bitmap)
+S3method(as.rowid, list)
+S3method(as.rowid, default)
+
+S3method('[<-', bitmap)
 
 S3method('[', seqfile)
 S3method(print, seqfile)
