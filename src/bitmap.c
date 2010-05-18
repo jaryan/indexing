@@ -128,7 +128,7 @@ SEXP bitmap_dlogical (SEXP _e1, SEXP _e2, SEXP _type) {
   return _e1;
 }
 
-SEXP which_bits (SEXP _bits, SEXP _hint) {
+SEXP which_bits_2 (SEXP _bits, SEXP _hint) {
   int i, b, b32, count=0, max_count=0;
   int *bits = INTEGER(_bits);
   int bits_len = length(_bits);
@@ -175,8 +175,8 @@ SEXP which_bits (SEXP _bits, SEXP _hint) {
   return _index;
 }
 
-SEXP which_bits_2 (SEXP _bits) {
-  int i, b, b32, ck, count=0, max_count=0;
+SEXP which_bits (SEXP _bits) {
+  int i, b, b32, ck, count=0;
   int *bits = INTEGER(_bits);
   int bits_len = length(_bits);
 
