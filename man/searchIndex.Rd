@@ -1,5 +1,5 @@
-\name{searchIndex}
-\alias{searchIndex}
+\name{search_index}
+\alias{search_index}
 \alias{"[.indexed_db"}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
@@ -10,7 +10,7 @@ Underlying tool to find matching values based on
 boolean algebra criteria.
 }
 \usage{
-searchIndex(column, 
+search_index(column, 
             x,
             type = "=",
             SIZE = 1e+05,
@@ -103,8 +103,8 @@ pwd <- getwd()
 setwd(tempdir())
 a <- sample(100L, 1000, TRUE)
 createIndex(a)
-searchIndex('a', 33)
-a[searchIndex('a', 33)]
+search_index('a', 33)
+a[search_index('a', 33)]
 rm(a)
 setwd(pwd)
 }

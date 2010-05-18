@@ -1,6 +1,7 @@
-\name{createIndex}
+\name{create_index}
+\alias{create_index}
+\alias{load_index}
 \alias{createIndex}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Create Query Index
 }
@@ -9,13 +10,12 @@ Index an R object in memory and save to disk. This is an S3
 method with methods for common types in R.
 }
 \usage{
-createIndex(x, column = NULL, envir = .IndexEnv, ...)
+create_index(x, column = NULL, envir = .IndexEnv, ...)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{
 \R object to be indexed.  Atomic types or can be a type
-that has a \code{createIndex} method.
+that has a \code{create_index} method.
 }
   \item{column}{
 Optional column name. If omitted, it is derived from the \code{x}
@@ -52,7 +52,7 @@ on type there may be components for run-length encoded sorted values
 \sQuote{l}.
 
 If the function uses \pkg{mmap} internally (currently the only way),
-the internall components of the \code{envir} are written to disk so
+the internal components of the \code{envir} are written to disk so
 the may be subsequently read back in via \code{mmap}. This process
 creates three to five files on disk.  The are named according to the following
 scheme: 
@@ -66,7 +66,7 @@ Original data is saved as
 
 The final environment object that is set-up or eventually modified during
 subseqeunt calls to \code{createIndex} on new columns is used by
-\sQuote{searchIndex} internally to find matching data for a given
+\sQuote{search_index} internally to find matching data for a given
 criteria in k * O(log(n)) time, where \code{k} is dependent on the
 number of criteria inherent in the query.
 }
@@ -86,7 +86,7 @@ is subject to getting better (read: change).  Please be patient.
 }
 
 \seealso{
-\code{\link{searchIndex}}
+\code{\link{search_index}}
 }
 \examples{
 }
