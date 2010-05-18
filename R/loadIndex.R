@@ -1,3 +1,4 @@
+load_data <- 
 loadData  <- function(column,
                       mode=int32(),
                       subclass=NULL,
@@ -38,7 +39,8 @@ loadData  <- function(column,
   invisible(envir)
 }
 
-loadIndex <- function(column,
+load_index <- loadIndex <- 
+             function(column,
                       mode=int32(),
                       subclass=NULL,
                       omode=int32(),
@@ -91,9 +93,6 @@ loadIndex <- function(column,
     # load order
     if(verbose > 1)
       message(paste("loading index",sQuote(column[i])))
-#    envir[[column[i]]]$o <- mmap(ordered_path, 
-#                                 mode=omode[[i]],
-#                                 prot=mmapFlags("PROT_READ"))
     envir[[column[i]]]$o <- seqfile(ordered_path, omode[[i]])
 
     # rle is an experimental/alternate index search scheme
@@ -122,14 +121,9 @@ loadIndex <- function(column,
           col$d <- structure(col$d, levels=col$l, class='dfactor')
         }
         envir[[column[i]]] <- col
-#      if(verbose > 1)
-#        message(paste("loading levels",sQuote(column[i])))
-#      l <- readBin(levels_path, character(), 1e6)
-#      envir[[column[i]]]$l <- l
-#      extractFUN(envir[[column[i]]]$d) <- function(x) {
-#        as.character(structure(x, levels=l, class='factor'))
-#      }
+        
     }
+    envir[[column[i]]]$env <- envir
   }
   invisible(envir)
 }

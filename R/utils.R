@@ -68,3 +68,8 @@ make_chunk <- function(n, envir=.IndexEnv) {
 #  tte <- lapply(1:11, function(x) db[make_chunk(x), expiry-dates])
 #
 #
+
+clear_indexes <- function(db, warn=FALSE) {
+  rm(list=ls(db), envir=db)
+}
+

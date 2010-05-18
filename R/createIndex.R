@@ -1,4 +1,4 @@
-createIndex <-
+create_index <- createIndex <-
 function(x, column=NULL, type="mmap", force=FALSE, envir=.IndexEnv, ...) {
   if(missing(column)) 
     column <- deparse(substitute(x))
@@ -6,18 +6,18 @@ function(x, column=NULL, type="mmap", force=FALSE, envir=.IndexEnv, ...) {
     stop("createIndex requires 'x' to be a data object")
   if(file.exists(paste(column,"sorted.bin",sep="_")))
     if(!force)
-      stop("data already exists. Remove disk structure or use 'loadIndex'")
-  get(paste("createIndex",type,sep="."))(x=x,column=column,envir=envir,...)
+      stop("data already exists. Remove disk structure or use 'load_index'")
+  get(paste("create_index",type,sep="."))(x=x,column=column,envir=envir,...)
 }
 
-createIndex.mmap <- function(x, column, force, envir, ...) {
-  UseMethod("createIndex.mmap")
+create_index.mmap <- function(x, column, force, envir, ...) {
+  UseMethod("create_index.mmap")
 }
-createIndex.mem <- function(x, column, force, envir, ...) {
+create_index.mem <- function(x, column, force, envir, ...) {
   stop("no memory indexing implemented yet: use type='mmap'")
 }
 
-createIndex.mmap.integer <-
+create_index.mmap.integer <-
 function(x, column, mode=integer(), force=FALSE, envir=.IndexEnv, ...) {
   envir[[column]] <- structure(list(),class="indexed")
   writeBin(x, paste(column,"data.bin",sep="_"))
@@ -32,7 +32,7 @@ function(x, column, mode=integer(), force=FALSE, envir=.IndexEnv, ...) {
   envir
 }
 
-createIndex.mem.integer <-
+create_index.mem.integer <-
 function(x, column=NULL, mode=integer(), force=FALSE, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
@@ -48,7 +48,7 @@ function(x, column=NULL, mode=integer(), force=FALSE, envir=.IndexEnv, ...) {
   envir
 }
 
-createIndex.mmap.double <-
+create_index.mmap.double <-
 function(x, column=NULL, mode=double(), force=FALSE, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))
@@ -65,7 +65,7 @@ function(x, column=NULL, mode=double(), force=FALSE, envir=.IndexEnv, ...) {
   envir
 }
 
-createIndex.mmap.character <-
+create_index.mmap.character <-
 function(x, column=NULL, envir=.IndexEnv, ...) {
   if(missing(column))
     column <- deparse(substitute(x))

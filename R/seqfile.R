@@ -1,6 +1,6 @@
 # seqfile is a class to allow [ subsetting for
 # fast sequential disk reads.  This is applicable
-# for $o[] extraction from disk in searchIndex
+# for $o[] extraction from disk in search_index
 
 seqfile <- function(file, mode) {
   structure(list(data=file, 

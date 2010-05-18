@@ -1,4 +1,4 @@
-searchIndex <-
+search_index <-
 function(column, x, type='=', SIZE=1e5, env=.IndexEnv, 
          range=FALSE, count=FALSE, parallel=FALSE) {
   if(type=="=")
@@ -23,7 +23,7 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     # that match
     if(inherits(.x,"indexed_list")) {
       rows <- mclapply(1:length(unclass(.x)),function(e) {
-                       searchIndex(column=column,x=x,
+                       search_index(column=column,x=x,
                                    type=type,SIZE=SIZE,
                                    env=structure(.x[[e]],
                                        class=class(.x[[e]])),
@@ -51,8 +51,8 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     if(missing(type) || type=="%r%")
       type <- c(">=","<=")
     if(length(type) != 2L) stop("length of 'type' and 'x' must match")
-    i <- seq(searchIndex(column, x[1], type=type[1], SIZE, env, range=TRUE),
-             searchIndex(column, x[2], type=type[2], SIZE, env, range=TRUE))
+    i <- seq(search_index(column, x[1], type=type[1], SIZE, env, range=TRUE),
+             search_index(column, x[2], type=type[2], SIZE, env, range=TRUE))
   } else { # non-range query
     if(!is.null(.x$l) && 
        (is.character(.x$l) || ( is.mmap(.x$l) && is.character(.x$l$storage.mode)))
@@ -124,6 +124,7 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     return(length(i))
   if(!is.null(.x$o))
     i <- .x$o[i]
-  .Call("indexing_add_class", i, length(.x), "rowid")
+  i <- .Call("indexing_add_class", i, length(.x), "rowid")
+  return(i)
   #structure(i,bitmap=bitmap, len=length(.x), class="rowid")
 }

@@ -24,6 +24,15 @@ new_bitmap <- function(template) {
 `&.bitmap` <- function(e1, e2) {
   .Call("bitmap_dlogical", e1, e2, 1L)
 }
+
 `|.bitmap` <- function(e1, e2) {
   .Call("bitmap_dlogical", e1, e2, 2L)
+}
+
+print.bitmap <- function(x, ...) {
+  print(which.bits(x), ...)
+}
+
+which.bits <- function(x, ...) {
+  .Call("which_bits", x)
 }
