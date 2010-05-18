@@ -4,15 +4,14 @@ export(
   .IndexEnv,
   indexenv,
 
-  createIndex,
+  create_index,
   createData,
-  loadIndex,
+  load_index, loadIndex,
   loadHIndex,
   loadData,
-  searchIndex,
+  search_index,
 
   "%r%",
-  qsubset,
 
   ## dimnames and dim to simulate rectangular
   dimnames.indexed_db,
@@ -22,7 +21,11 @@ export(
 
 export(
   is.bitmap,
-  as.rowid
+  is.bitmap_lzo,
+  as.rowid,
+
+  compress_bitmap,
+  decompress_bitmap_lzo
 )
 
 export(
@@ -40,6 +43,7 @@ S3method(as.rowid, list)
 S3method(as.rowid, default)
 
 S3method('[<-', bitmap)
+S3method(print, bitmap)
 
 S3method('[', seqfile)
 S3method(print, seqfile)
@@ -47,35 +51,38 @@ S3method(print, seqfile)
 S3method('[', dfactor)
 S3method(print, dfactor)
 
-S3method(createIndex.mmap, integer)
-S3method(createIndex.mmap, double)
-S3method(createIndex.mmap, character)
+S3method(create_index.mmap, integer)
+S3method(create_index.mmap, double)
+S3method(create_index.mmap, character)
 
-S3method("<",  "indexed")
-S3method("<=", "indexed")
-S3method(">",  "indexed")
-S3method(">=", "indexed")
-S3method("==", "indexed")
-S3method("!=", "indexed")
-S3method("%r%", "indexed")
-S3method("%r%", "numeric")
-S3method("%r%", "mmap")
+S3method("<",  indexed)
+S3method("<=", indexed)
+S3method(">",  indexed)
+S3method(">=", indexed)
+S3method("==", indexed)
+S3method("!=", indexed)
+S3method("%r%", indexed)
+S3method("%r%", numeric)
+S3method("%r%", mmap)
 
-S3method(length, "indexed")
-S3method(seq, "indexed_list")
+S3method(length, indexed)
+S3method(seq, indexed_list)
 
-S3method(subset, "indexed_db")
+S3method(subset, indexed_db)
 
 # indexed_posixct
-S3method(Ops, "indexed_posixct")
+S3method(Ops, indexed_posixct)
 
 # indexed_date
-S3method("==", "indexed_date")
+S3method("==", indexed_date)
 
-S3method("[", "indexed_db")
+S3method("[", indexed_db)
 
-S3method("&", "rowid")
-S3method("|", "rowid")
+S3method("&", rowid)
+S3method("|", rowid)
+
+S3method("&", bitmap)
+S3method("|", bitmap)
 
 S3method(print, indexed_db)
 S3method(print, rowid)
