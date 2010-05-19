@@ -43,10 +43,25 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
   }
 
   if(is.null(.x$o)) {
-    # unsorted/ordered data.  requires full vector scan
+  ### UNSORTED data 
+  ###               linear scan             ###
     i <- eval(do.call(type,list(.x$d,x)))
+  } else 
+  ### SORTED data
+  if(!is.null(.x$rle)) {
+  ###               rle search              ###
+    if(!is.null(.x$l) && 
+       (is.character(.x$l) || ( is.mmap(.x$l) && is.character(.x$l$storage.mode)))
+      ) {
+      x <- x==.x$l
+      if(length(x) > 0 && is.logical(x))
+        x <- which(x) 
+    } 
+    i <- do.call(seq, as.list(.x$rle[max(x-1,1):x]+c(1,0)))
   } else {
-  # sorted data. can use binary/rle search
+  ###               bitmap search           ###
+
+  ###               binary search           ###
   if(length(x) == 2) { # range query
     if(missing(type) || type=="%r%")
       type <- c(">=","<=")

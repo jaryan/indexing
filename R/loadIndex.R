@@ -98,7 +98,8 @@ load_index <- loadIndex <-
     # rle is an experimental/alternate index search scheme
     rle_path <- paste(column[i], "rle.bin", sep="_")
     if(file.exists(rle_path))
-      envir[[column[i]]]$rle <- mmap(rle_path, mode=omode[[i]])
+      envir[[column[i]]]$rle <- cumsum(readBin(rle_path, integer(), 1e5)) # need to vary size
+      #envir[[column[i]]]$rle <- mmap(rle_path, mode=omode[[i]])
 
     # levels exist for non-numeric data (char -> factor)
     levels_path <- paste(column[i], "levels.bin", sep="_")
