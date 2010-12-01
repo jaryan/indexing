@@ -65,7 +65,7 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
   # if db[condition] simply return rows, with print.rowid showing
   # the equivelent of count(*) in SQL
 
-  if((length(i)==0 && nargs()==2) || nargs()==2)
+  if(length(i)==0 || nargs()==2)
     return(as.rowid(i))
     #return(structure(i, class="rowid"))
 

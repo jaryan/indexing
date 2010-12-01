@@ -51,15 +51,16 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
   if(!is.null(.x$rle)) {
   ###               rle search              ###
     if(!is.null(.x$l) && 
-       (is.character(.x$l) || ( is.mmap(.x$l) && is.character(.x$l$storage.mode)))
-      ) {
+       (is.character(.x$l) || ( is.mmap(.x$l) && 
+       is.character(.x$l$storage.mode)))) {
       x <- x==.x$l
       if(length(x) > 0 && is.logical(x))
         x <- which(x) 
     } 
-    i <- do.call(seq, as.list(.x$rle[max(x-1,1):x]+c(1,0)))
+    i <- do.call(seq, as.list(c(max(.x$rle[x-1],0)+1, .x$rle[x])))
   } else {
   ###               bitmap search           ###
+  ###               hash search           ###
 
   ###               binary search           ###
   if(length(x) == 2) { # range query
@@ -105,9 +106,9 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
         i <- (1:length(.x$s))[-i]
     } else
     if(type == "<") {
-      if(range)
-        return(final_index[x_start]-1)
-      i <- seq(1,final_index[x_start]-1)
+      if(range)  # added max(na.omit to try and handle outside cases
+        return(max(na.omit(final_index[x_start]),0)-1)
+      i <- seq(1,max(na.omit(final_index[x_start]),0)-1)
     } else
     if(type == "<=") {
       if(range)
@@ -116,8 +117,8 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     } else
     if(type == ">") {
       if(range)
-        return(final_index[x_end])
-      i <- seq(final_index[x_end]+1, length(.x$s))
+        return(max(final_index[x_end],0)+1)
+      i <- seq(max(final_index[x_end],0)+1, length(.x$s))
     } else
     if(type == ">=") {
       if(range)

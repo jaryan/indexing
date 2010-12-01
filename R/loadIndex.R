@@ -218,7 +218,7 @@ loadHIndex <- function(column,
       rle_path <- file.path(dir,column[i],column_path[part],
                             paste(column[i], "rle.bin", sep="_"))
       if(file.exists(rle_path))
-        col$rle <- mmap(rle_path, mode=omode[[i]])
+        envir[[column[i]]]$rle <- cumsum(readBin(rle_path, integer(), 1e6)) # need to vary size
   
       # levels exist for non-numeric data (char -> factor)
       levels_path <- file.path(dir,column[i],column_path[part],

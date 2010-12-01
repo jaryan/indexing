@@ -7,7 +7,7 @@ function(x, column=NULL, type="mmap", force=FALSE, envir=.IndexEnv, ...) {
   if(file.exists(paste(column,"sorted.bin",sep="_")))
     if(!force)
       stop("data already exists. Remove disk structure or use 'load_index'")
-  get(paste("create_index",type,sep="."))(x=x,column=column,envir=envir,...)
+  get(paste("create_index",type,sep="."))(x=x,column=column,envir=envir,force=force,...)
 }
 
 create_index.mmap <- function(x, column, force, envir, ...) {
