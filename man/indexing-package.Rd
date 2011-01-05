@@ -72,7 +72,7 @@ tuning and advanced features, please see the rest of the documentation.
 \author{
 Jeffrey A. Ryan
 
-Maintainer: <jeffrey.ryan@insightalgo.com>
+Maintainer: <jeff.a.ryan@gmail.com>
 }
 \references{
 The indexing package is inspired by previous works in R and in general
