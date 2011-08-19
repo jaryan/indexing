@@ -2,9 +2,11 @@
 
 `[.dfactor` <- function(x, i, ...) {
   class(x) <- "mmap"
-  structure(x[i], levels=attr(x, "levels"), class=c("dfactor","mmap"))
-  x <- structure(x[i], levels=attr(x, "levels"), class=c("dfactor","mmap"))
-  as.character(attr(x, "levels")[x])
+  #structure(x[i], levels=attr(x, "levels"), class=c("dfactor","mmap"))
+  xx <- structure(x[i],
+        levels=attr(x, "levels"), class=c("dfactor","mmap"))
+  class(x) <- c("dfactor","mmap")
+  as.character(attr(xx, "levels")[xx])
 }
 
 print.dfactor <- function(x, ...) {

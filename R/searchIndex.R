@@ -43,11 +43,11 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
   }
 
   if(is.null(.x$o)) {
-  ### UNSORTED data 
+### UNSORTED data 
   ###               linear scan             ###
     i <- eval(do.call(type,list(.x$d,x)))
   } else 
-  ### SORTED data
+### SORTED data
   if(!is.null(.x$rle)) {
   ###               rle search              ###
     if(!is.null(.x$l) && 
@@ -57,19 +57,22 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
       if(length(x) > 0 && is.logical(x))
         x <- which(x) 
     } 
-    i <- do.call(seq, as.list(c(max(.x$rle[x-1],0)+1, .x$rle[x])))
+    #if(length(x) > 0) {
+      #i <- do.call(seq, as.list(c(max(.x$rle[x-1],0)+1, .x$rle[x])))
+      i <- do.call(seq, as.list(c(.x$rle[x-1]+1, .x$rle[x])))
+    #} else i <- integer(0)
   } else {
   ###               bitmap search           ###
   ###               hash search           ###
 
   ###               binary search           ###
-  if(length(x) == 2) { # range query
+  if(length(x) == 2) {                  # range query
     if(missing(type) || type=="%r%")
       type <- c(">=","<=")
     if(length(type) != 2L) stop("length of 'type' and 'x' must match")
     i <- seq(search_index(column, x[1], type=type[1], SIZE, env, range=TRUE),
              search_index(column, x[2], type=type[2], SIZE, env, range=TRUE))
-  } else { # non-range query
+  } else {                              # non-range query
     if(!is.null(.x$l) && 
        (is.character(.x$l) || ( is.mmap(.x$l) && is.character(.x$l$storage.mode)))
       ) {
@@ -107,8 +110,10 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     } else
     if(type == "<") {
       if(range)  # added max(na.omit to try and handle outside cases
-        return(max(na.omit(final_index[x_start]),0)-1)
-      i <- seq(1,max(na.omit(final_index[x_start]),0)-1)
+        return(na.omit(final_index[x_start])-1)
+      i <- seq(1,na.omit(final_index[x_start])-1)
+      #  return(max(na.omit(final_index[x_start]),0)-1)
+      #i <- seq(1,max(na.omit(final_index[x_start]),0)-1)
     } else
     if(type == "<=") {
       if(range)
@@ -117,8 +122,10 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     } else
     if(type == ">") {
       if(range)
-        return(max(final_index[x_end],0)+1)
-      i <- seq(max(final_index[x_end],0)+1, length(.x$s))
+        return(final_index[x_end]+1)
+      i <- seq(final_index[x_end]+1, length(.x$s))
+      #  return(max(final_index[x_end],0)+1)
+      #i <- seq(max(final_index[x_end],0)+1, length(.x$s))
     } else
     if(type == ">=") {
       if(range)
