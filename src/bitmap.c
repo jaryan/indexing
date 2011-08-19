@@ -188,6 +188,8 @@ SEXP which_bits (SEXP _bits) {
   for(ck=0; ck < 5; ck++) {
     for(; b<bchunk_array[ck]; b++) {
       b32 = b*32+1;
+      if(bits[b] == 0)
+        continue;
       for(i=0; i<32; i++) {
         if(bitmask[i] & bits[b]) {
           //index[count] = i+(32*b)+1; 
@@ -224,6 +226,10 @@ SEXP count_bits (SEXP _bits) {
   int bits_len = length(_bits);
 
   for(b=0; b<bits_len; b++) {
+  if(bits[b] == -1) {
+    count = count+32;
+    continue;
+  }
   for(i=0; i<32; i++) {
     if(bitmask[i] & bits[b]) {
       count++;
