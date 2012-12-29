@@ -29,7 +29,9 @@ loadData  <- function(column,
     #  optional:
     #    rle: run-length encoded vector
     #      l: levels for character/factor
-    data_path <- paste(column[i], "data.bin", sep="_")
+    if(is.null(dir))
+      dir <- "."
+    data_path <- paste(file.path(dir,column[i]), "data.bin", sep="_")
     if(file.exists(data_path)) {
       if(verbose)
         message(paste("loading data",sQuote(column[i])))
@@ -74,15 +76,17 @@ load_index <- loadIndex <-
     #  optional:
     #    rle: run-length encoded vector
     #      l: levels for character/factor
-    data_path <- paste(column[i], "data.bin", sep="_")
+    if(is.null(dir))
+      dir <- "."
+    data_path <- paste(file.path(dir,column[i]), "data.bin", sep="_")
     if(file.exists(data_path)) {
       if(verbose)
         message(paste("loading data",sQuote(column[i])))
       envir[[column[i]]]$d <- mmap(data_path, mode=mode[[i]])
     }
 
-    sorted_path <- paste(column[i], "sorted.bin", sep="_")
-    ordered_path <- paste(column[i], "ordered.bin", sep="_")
+    sorted_path <- paste(file.path(dir,column[i]), "sorted.bin", sep="_")
+    ordered_path <- paste(file.path(dir,column[i]), "ordered.bin", sep="_")
     stopifnot(file.exists(sorted_path) || file.exists(ordered_path))
     # load sorted data
     if(verbose > 1)
@@ -96,13 +100,13 @@ load_index <- loadIndex <-
     envir[[column[i]]]$o <- seqfile(ordered_path, omode[[i]])
 
     # rle is an experimental/alternate index search scheme
-    rle_path <- paste(column[i], "rle.bin", sep="_")
+    rle_path <- paste(file.path(dir,column[i]), "rle.bin", sep="_")
     if(file.exists(rle_path))
       envir[[column[i]]]$rle <- cumsum(readBin(rle_path, integer(), 1e5)) # need to vary size
       #envir[[column[i]]]$rle <- mmap(rle_path, mode=omode[[i]])
 
     # levels exist for non-numeric data (char -> factor)
-    levels_path <- paste(column[i], "levels.bin", sep="_")
+    levels_path <- paste(file.path(dir,column[i]), "levels.bin", sep="_")
     if(file.exists(levels_path)) {
       # currenly hard coded to 1mm levels, need to fix
         col <- envir[[column[i]]]

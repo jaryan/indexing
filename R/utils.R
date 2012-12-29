@@ -10,7 +10,7 @@ length.indexed <- function(x) {
   # indexed objects may have data and/or ordered slots, but need at least one
   # all need to be of equal length
   if(inherits(x,"indexed_list")) {
-    sum(sapply(x,function(L) if(is.null(L$o)) length(L$d) else length(L$o)))
+    sum(as.numeric(sapply(x,function(L) if(is.null(L$o)) length(L$d) else length(L$o))))
   }
   else {
     if(is.null(x$o))
