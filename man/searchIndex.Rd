@@ -102,8 +102,8 @@ User beware!
 pwd <- getwd()
 setwd(tempdir())
 a <- sample(100L, 1000, TRUE)
-createIndex(a)
-search_index('a', 33)
+db <- create_index(a)
+db <- search_index('a', 33)
 a[search_index('a', 33)]
 rm(a)
 setwd(pwd)

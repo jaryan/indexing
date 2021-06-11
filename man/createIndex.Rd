@@ -41,7 +41,7 @@ It is possible to use all in-memory objects, though the performance
 gain is negligible, and in many tests turns out to be negative.
 
 The objects used by \pkg{indexing} are stored in the \code{envir}
-specified to createIndex. Internal to this are objects named
+specified to create_index Internal to this are objects named
 according to the column name derived from the object symbol, or
 specified with \code{column}. This object is a list
 including components for the \pkg{mmap} objects corresponding
@@ -58,14 +58,14 @@ creates three to five files on disk.  The are named according to the following
 scheme: 
 
 Original data is saved as
- \sQuote{column_data.bin}, 
+\sQuote{column_data.bin}, 
 \sQuote{column_sorted.bin}, 
 \sQuote{column_ordered.bin}, 
 \sQuote{column_rle.bin}, 
 \sQuote{column_levels.bin}.
 
 The final environment object that is set-up or eventually modified during
-subseqeunt calls to \code{createIndex} on new columns is used by
+subsequent calls to \code{create_index} on new columns is used by
 \sQuote{search_index} internally to find matching data for a given
 criteria in k * O(log(n)) time, where \code{k} is dependent on the
 number of criteria inherent in the query.
@@ -89,6 +89,30 @@ is subject to getting better (read: change).  Please be patient.
 \code{\link{search_index}}
 }
 \examples{
+pwd <- getwd()
+set.seed(123)
+setwd(tempdir())
+a <- sample(c("a", "set", "of", "words"), 20, replace=TRUE)
+b <- sample(5, 20, replace=TRUE)
+c <- rnorm(20)
+db <- create_index(a)
+db <- create_index(b)
+db <- create_index(c)
+db
+db[b > 2]
+db[b > 2,]
+db[b > 2, order='c']
+db[b > 2, order=c('b','c')]
+db[b > 2, order=c('-b','c')]
+db[b > 2, order=c('-b','-c')]
+db[b > 2, order=c('-b','-c'), limit=5]
+db[c > 0,]
+db[c > 0, c('a')]
+db[c > 0, list(a, b)]
+db[c > 0, data.frame(cb=c^b, a, b100=b*100)]
+#rm(list=c("a","b","c"), envir=db)
+#rm(a,b,c)
+#setwd(pwd)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
