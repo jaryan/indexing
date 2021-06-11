@@ -16,7 +16,7 @@ is.seqfile <- function(x) {
 }
 
 `[.seqfile` <- function(x, i, ...) {
-  if(length(i)==0)
+  if(length(i)==0 || i==0)
     return(logical(0))
   f <- base::file(x$data, open="rb")
   bytes <- nbytes(x$storage.mode)

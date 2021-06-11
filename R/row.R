@@ -18,7 +18,11 @@ as.rowid.list <- function(x) {
 }
 
 as.rowid.default <- function(x) {
-  structure(x, class="rowid")
+  if(is.null(x)) {
+    structure(list(), class="rowid")
+  } else {
+    structure(x, class="rowid")
+  }
 }
 
 `&.rowid` <- function(e1,e2) {

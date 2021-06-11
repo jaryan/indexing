@@ -92,8 +92,10 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     ul <- binsearch(x, sparse_index,FALSE)
     if(ul != length(sparse_index))
       ul <- ul+1L
-  
+
     final_index <- seq(sparse_seq[ll],sparse_seq[ul])
+#if(length(final_index) < length(sparse_seq))
+#    return(as.rowid(NULL))
     s_final_index <- .x$s[final_index]
   
     # avoid unnecessary binsearch for inequality
@@ -113,7 +115,7 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
         return(na.omit(final_index[x_start])-1)
       i <- seq(1,na.omit(final_index[x_start])-1)
       #  return(max(na.omit(final_index[x_start]),0)-1)
-      #i <- seq(1,max(na.omit(final_index[x_start]),0)-1)
+      #i <- seq(1,max(na.omit(final_index[x_start])-1,1))
     } else
     if(type == "<=") {
       if(range)
@@ -123,9 +125,9 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     if(type == ">") {
       if(range)
         return(final_index[x_end]+1)
-      i <- seq(final_index[x_end]+1, length(.x$s))
+      #i <- seq(final_index[x_end]+1, length(.x$s))
       #  return(max(final_index[x_end],0)+1)
-      #i <- seq(max(final_index[x_end],0)+1, length(.x$s))
+      i <- seq(max(na.omit(final_index[x_end]),0)+1, length(.x$s))
     } else
     if(type == ">=") {
       if(range)
@@ -142,12 +144,14 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     return(logical(0))
   if(length(i)==2 && i[2] < i[1])
     return(logical(0))
+  if(any(i == 0))
+    return(logical(0))
 
   if(count)
     return(length(i))
   if(!is.null(.x$o))
     i <- .x$o[i]
   i <- .Call("indexing_add_class", i, length(.x), "rowid")
-  return(i)
+  return(sort(i)) # final sort to return in order of data (not order of index)
   #structure(i,bitmap=bitmap, len=length(.x), class="rowid")
 }

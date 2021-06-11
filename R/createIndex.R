@@ -89,6 +89,12 @@ function(x, column=NULL, envir=.IndexEnv, ...) {
     x <- levels(x)
     writeBin(x, paste(column,"_levels.bin",sep=""))
     envir[[column]]$l <- x
+    #e <- new.env()
+    #e$l <- x
+    extractFUN(envir[[column]]$d) <- function(.) {
+      as.character(structure(., levels=x, class='factor'))
+    }
+    #environment(envir[[column]]$d$extractFUN) <- e
   } else x <- NULL
   envir
 }

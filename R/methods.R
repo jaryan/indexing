@@ -9,23 +9,22 @@
 
 orderBy <- function(x, order.by) {
   # internal use function to sort output columns
-  # currently only supports ascending sort order
   order.by <- rev(order.by)
   decr <- grepl("-",order.by)
   order.by <- gsub("-","",order.by)
   if(NCOL(x) > 1) {
-    temp.x <- x[order(x[[order.by[1]]],decreasing=decr[1]), ]
+    temp.x <- x[order(x[[order.by[1]]],decreasing=decr[1]),,drop=FALSE]
     if (length(order.by) > 1) {
         for (i in 2:length(order.by)) {
-            temp.x <- temp.x[order(temp.x[[order.by[i]]],decreasing=decr[i]), ]
+            temp.x <- temp.x[order(temp.x[[order.by[i]]],decreasing=decr[i]),,drop=FALSE]
         }
     }
   } else {
     # univariate series
-    temp.x <- x[order(x[[order.by[1]]],decreasing=decr[1])]
+    temp.x <- x[order(x[[order.by[1]]],decreasing=decr[1]),,drop=FALSE]
     if (length(order.by) > 1) {
         for (i in 2:length(order.by)) {
-            temp.x <- temp.x[order(temp.x[[order.by[i]]],decreasing=decr[i])]
+            temp.x <- temp.x[order(temp.x[[order.by[i]]],decreasing=decr[i]),,drop=FALSE]
         }
   }
   }
@@ -76,14 +75,11 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
       # check if we need to parse a character version of 'j'
       is_char <- try(is.character(mc_j_char <- eval(mc_j)),silent=TRUE)
       if(is.logical(is_char) && isTRUE(is_char) && !inherits(is_char,"try-error")) 
-        mc_j <- parse(text=mc_j_char)
+        mc_j <- parse(text = paste("data.frame(", paste(mc_j_char, collapse = ","), ")"), srcfile = NULL)
 
     } else {
       # if db[condition,] return the matching rows as [.data.frame would
-      mc_j <- parse(text=paste("data.frame(",
-                               paste(ls(envir),collapse=","),
-                               ")"),
-                    srcfile=NULL) 
+      mc_j <- parse(text=paste("data.frame(", paste(ls(envir),collapse=","), ")"), srcfile=NULL) 
     }
     # j should be the column list in .IndexEnv, $d the data
     #get(j, envir=envir)[["d"]][i]
@@ -131,8 +127,8 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
 
     if(!missing(limit)) {
       if(is.null(dim(res)))
-        res <- res[1:limit]
-      else res <- res[1:limit,]
+        res <- res[1:min(limit,NROW(res))]
+      else res <- res[1:min(limit,NROW(res)),]
     }
     res
   }
