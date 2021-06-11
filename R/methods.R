@@ -59,7 +59,11 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
                 envir=as.list(tmp.env,rev(sys.frames())),
                 enclos=parent.frame()))
   }
-  i <- eval(mc_i, envir=as.list(x,rev(sys.frames())), enclos=parent.frame())
+  if(missing(i)) {
+    i <- 1:nrow(x)
+  } else {
+    i <- eval(mc_i, envir=as.list(x,rev(sys.frames())), enclos=parent.frame())
+  }
  
   # if db[condition] simply return rows, with print.rowid showing
   # the equivelent of count(*) in SQL
