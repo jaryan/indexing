@@ -21,14 +21,8 @@ loadData  <- function(column,
       subclass[[i]] <- paste("indexed",subclass[[i]],sep="_") 
     envir[[column[i]]] <- structure(list(), 
                                     class=c(subclass[[i]],"indexed"))
-    # each column in the envir contains a list of entries:
+    # each column in the envir contains only data (no index information):
     #  d: original data mapping
-    #  s: sorted data
-    #  o: ordered data (location of sorted in data)
-    #  
-    #  optional:
-    #    rle: run-length encoded vector
-    #      l: levels for character/factor
     if(is.null(dir))
       dir <- "."
     data_path <- paste(file.path(dir,column[i]), "data.bin", sep="_")
