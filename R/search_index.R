@@ -59,7 +59,8 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     } 
     #if(length(x) > 0) {
       #i <- do.call(seq, as.list(c(max(.x$rle[x-1],0)+1, .x$rle[x])))
-      i <- do.call(seq, as.list(c(.x$rle[x-1]+1, .x$rle[x])))
+      #i <- do.call(seq, as.list(c(.x$rle[x-1]+1, .x$rle[x])))
+      i <- do.call(seq, list(sum(.x$rle[1:x-1]) + 1, sum(.x$rle[1:x-1])+ .x$rle[x]))
     #} else i <- integer(0)
   } else {
   ###               bitmap search           ###
@@ -151,7 +152,7 @@ function(column, x, type='=', SIZE=1e5, env=.IndexEnv,
     return(length(i))
   if(!is.null(.x$o))
     i <- .x$o[i]
-  i <- .Call("indexing_add_class", i, length(.x), "rowid")
-  return(sort(i)) # final sort to return in order of data (not order of index)
+  i <- .Call("indexing_add_class", sort(i), length(.x), "rowid")
+  return(i) # final sort to return in order of data (not order of index)
   #structure(i,bitmap=bitmap, len=length(.x), class="rowid")
 }
