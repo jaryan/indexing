@@ -1,5 +1,17 @@
 useDynLib(indexing)
 
+importFrom(stats, na.omit)
+
+importFrom(mmap,
+   as.Ctype,
+   "extractFUN<-",
+   int32,
+   is.mmap,
+   mmap,
+   mmapFlags,
+   nbytes
+)
+
 export(
   .IndexEnv,
   indexenv,
@@ -38,6 +50,7 @@ export(
 )
 
 S3method(dim, indexed_db)
+S3method(dimnames, indexed_db)
 
 S3method(as.rowid, rowid)
 S3method(as.rowid, bitmap)
