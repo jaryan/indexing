@@ -10,12 +10,18 @@ Index an R object in memory and save to disk. This is an S3
 method with methods for common types in R.
 }
 \usage{
-create_index(x, column = NULL, envir = .IndexEnv, ...)
+create_index(x, column = NULL, type = "mmap", force = FALSE, envir = .IndexEnv, ...)
 }
 \arguments{
   \item{x}{
 \R object to be indexed.  Atomic types or can be a type
 that has a \code{create_index} method.
+}
+  \item{type}{
+select \sQuote{mmap} (\pkg{mmap}) or \sQuote{mem} (in-memory) to be used as backing store.
+}
+  \item{force}{
+if on disk file already exists, overwrite?
 }
   \item{column}{
 Optional column name. If omitted, it is derived from the \code{x}
@@ -95,9 +101,9 @@ setwd(tempdir())
 a <- sample(c("a", "set", "of", "words"), 20, replace=TRUE)
 b <- sample(5, 20, replace=TRUE)
 c <- rnorm(20)
-db <- create_index(a)
-db <- create_index(b)
-db <- create_index(c)
+db <- create_index(a, force=TRUE)
+db <- create_index(b, force=TRUE)
+db <- create_index(c, force=TRUE)
 db
 db[b > 2]
 db[b > 2,]

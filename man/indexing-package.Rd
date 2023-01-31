@@ -90,8 +90,8 @@ tmpdir <- tempdir()
 setwd(tmpdir)
 a <- rnorm(100)
 b <- sample(1000L, 100)
-create_index(a)
-create_index(b)
+create_index(a, force=TRUE)
+create_index(b, force=TRUE)
 db <- indexenv()
 
 db

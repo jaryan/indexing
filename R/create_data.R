@@ -31,7 +31,7 @@ function(x, column=NULL, envir=.IndexEnv, ...) {
   if(!is.numeric(x))
     x <- as.factor(x)
   envir[[column]] <- structure(list(),class="indexed")
-  int_x <- as.integer(x)
+  x_int <- as.integer(x)
   writeBin(x_int, paste(column,"data.bin",sep="_"))
   envir[[column]]$d <- x_int
   rm(x_int)  # just in case we need to gc()

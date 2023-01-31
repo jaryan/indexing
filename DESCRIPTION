@@ -6,6 +6,6 @@ Date: 2023-01-29
 Depends: mmap
 Author: Jeffrey A. Ryan
 Maintainer: Jeffrey A. Ryan <jeff.a.ryan@gmail.com>
-Description: Database Tools for R Objects
+Description: Database functionality using R syntax, backed by memory or out-of-core using mmap.
 License: GPL-3
 LazyLoad: yes

@@ -34,7 +34,7 @@ orderBy <- function(x, order.by) {
 # main subsetting function
 subset.indexed_db <- 
    `[.indexed_db` <- 
-function(x, i, j, group, order., limit, count=FALSE, ...) {
+function(x, i, j, group, order., limit, count=FALSE, drop,...) {
   if(!missing(group))
     return(match.call(`[.indexed_db`))
   mc_i <- match.call(`[.indexed_db`)$i
@@ -112,7 +112,8 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
         # if not in 'database' look up frames until we find
         for(f in rev(sys.frames())) {
           if(exists(vars[v],envir=f)) {
-            VAR <- get(vars[v], envir=f)[as.rowid(i)]
+            # VAR <- get(vars[v], envir=f)[as.rowid(i)] # this may be needed in cases of recycling or if found in envir??
+            VAR <- get(vars[v], envir=f)
             break
           }
         }
@@ -134,6 +135,9 @@ function(x, i, j, group, order., limit, count=FALSE, ...) {
         res <- res[1:min(limit,NROW(res))]
       else res <- res[1:min(limit,NROW(res)),]
     }
+    if (!missing(drop) && !drop && is.null(dim(res))) 
+      res <- structure(res, dim = c(length(res), 1), dimnames = list(seq(length(res)), vars))
+
     res
   }
   else as.rowid(i)

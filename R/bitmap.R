@@ -13,7 +13,7 @@ new_bitmap <- function(template) {
   .Call("new_bitmap", template)
 }
 
-`[<-.bitmap` <- function(x, i, value,...) {
+`[<-.bitmap` <- function(x, i, value) {
   if(value) {
     .Call("bitmap_true", i, x)
   } else {

@@ -15,7 +15,9 @@ search_index(column,
             type = "=",
             SIZE = 1e+05,
             env = .IndexEnv,
-            range = FALSE)
+            range = FALSE,
+            count = FALSE,
+            parallel = FALSE)
 }
 \arguments{
   \item{column}{
@@ -58,6 +60,12 @@ The environment of the data objects (internal indexing database)
 }
   \item{range}{
 Used internally. Not to be set by the caller.
+}
+  \item{count}{
+Only return number of matching rows.
+}
+  \item{parallel}{
+Parallelize if possible.
 }
 }
 \details{
@@ -102,7 +110,7 @@ User beware!
 pwd <- getwd()
 setwd(tempdir())
 a <- sample(100L, 1000, TRUE)
-db <- create_index(a)
+db <- create_index(a, force=TRUE)
 db <- search_index('a', 33)
 a[search_index('a', 33)]
 rm(a)
